@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'WordDoctorApp.apps.WorddoctorappConfig', #This object was created for us in /WordDoctorApp/apps.py
 ]
 
 MIDDLEWARE = [
