@@ -9,7 +9,7 @@
     <meta name="author" content="TemplateMo">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700" rel="stylesheet">
 
-    <title>Host Cloud - Free HTML5 Bootstrap Template</title>
+    <title>WordDoctor</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -104,11 +104,11 @@ https://templatemo.com/tm-541-host-cloud
                 <h2>Solvers</h2>
               </div>
               <ul class="footer-list">
-                <li><a href="#">Basic Cloud 5X</a></li>
-                <li><a href="#">Cloud VPS 10X</a></li>
-                <li><a href="#">Advanced Cloud</a></li>
-                <li><a href="#">Custom Designs</a></li>
-                <li><a href="#">Special Solutions</a></li>
+                <li><a href="{% url 'wordle' %}">Wordle</a></li>
+                <li><a href="{% url 'scrabble' %}">Scrabble</a></li>
+                <li><a href="{% url 'anagrams' %}">Anagrams</a></li>
+                <li><a href="{% url 'boggle' %}">Boggle</a></li>
+                <li><a href="{% url 'wordscape' %}">WordScape</a></li>
               </ul>
             </div>
           </div>
