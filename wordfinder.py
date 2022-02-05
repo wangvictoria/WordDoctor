@@ -184,9 +184,6 @@ def anagrams():
 
     # taking input from user for word with which to find anagrams
     word_to_anagram = input("Enter your word for which to find anagrams: ")
-
-    # using python_datastructures package for this implementation 
-    t = Trie()
     word_list = None
 
     # going through scrabble dictionary to use this as the basis for finding anagrams
@@ -205,7 +202,6 @@ def anagrams():
     for word in word_list:
         word = word.strip()
         if len(word) <= len(word_to_anagram):
-            t.add(word)
             word_dict[len(word)].append(word)
     
     # finding what amounts to the powerset of the word's chars to
