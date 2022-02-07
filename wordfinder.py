@@ -1,6 +1,7 @@
 from gettext import npgettext
 import multiprocessing as mp
 from multiprocessing.dummy import Process, Manager
+from re import I
 from python_datastructures import Trie
 import numpy as np
 import itertools as it
@@ -10,7 +11,7 @@ SCRABBLE_END = 15
 WORDLE_LEN = 5
 ALPHABET_START = 1
 ALPHABET_END = 26
-PATH = "/Users/shaneausmus/Desktop/Vandy Course Materials/Spring 2022/CS 4279"
+PATH = "/Users/shaneausmus/Desktop/Vandy Course Materials/Spring 2022/CS 4279/WordDoctor"
 
 # Thinking about trying to time how long finding characters in all the words would take in
 # Python with multi-threading and with the standard approach I outline below using one of
@@ -22,7 +23,7 @@ PATH = "/Users/shaneausmus/Desktop/Vandy Course Materials/Spring 2022/CS 4279"
 # Wordle --> DONE
 # Anagrams --> DONE
 # Boggle / WordHunt
-# Wordscape
+# Wordscape --> this is super easy and can be done with a solid runtime by just reducing anagrams
 
 def main_scrabble():
     user_chars = input("Enter your characters: ")
@@ -151,21 +152,19 @@ def wordle():
         word_list = file.readlines()
         substr = "".join(char_list)
 
-        words_with_in_order_chars = np.array([])
-        words_with_out_of_order_chars = np.array([])
+        words_with_in_order_chars = []
+        words_with_out_of_order_chars = []
 
         # performing search for sequences of letters in order
         for word in word_list:
             word = word.strip()
             if substr in word:
-                a = np.append(words_with_in_order_chars, word)
-                words_with_in_order_chars = a
+                words_with_in_order_chars.append(word)
             for i in range(0, len(char_list), 1):
                 if char_list[i] not in word:
                     break
                 if i == len(char_list) - 1:
-                    a = np.append(words_with_out_of_order_chars, word)
-                    words_with_out_of_order_chars = a
+                    words_with_out_of_order_chars.append(word)
                 
         if words_with_in_order_chars:
             print(f'Potential Wordle words with requested letters (sequentially):')
@@ -222,7 +221,8 @@ def anagrams():
     for word in word_to_anagram_permutations:
         word_to_anagram_permutations_strings.append("".join(word))
 
-    print(word_to_anagram_permutations_strings)
+    # eliminating duplicates
+    word_to_anagram_permutations_strings = list(set(word_to_anagram_permutations_strings))
     
     anagrams = []
 
@@ -232,9 +232,78 @@ def anagrams():
         if word in word_dict[len(word)]:
             anagrams.append(word)
 
+    anagrams = sorted(list(set(anagrams)), key=len)
+
     print(f"Here are your anagrams for {word_to_anagram}\n{anagrams}")
 
 
+# here's another implementation of anagrams with a Trie data structure 
+# just to check which implementation is faster
+def anagrams_trie():
+
+    # taking input from user for word with which to find anagrams
+    word_to_anagram = input("Enter your word for which to find anagrams: ")
+    word_list = None
+
+    # oxford will have the entire applicable dictionary of related words within it
+    oxford = Trie()
+
+    # t will be the Trie to which we add words which are anagrams
+    t = Trie()
+
+    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START + 1, len(word_to_anagram) + 1, 1)])
+
+    for key in word_dict.keys():
+        word_dict[key] = []
+
+    # going through scrabble dictionary to use this as the basis for finding anagrams
+    with open(f"{PATH}/words.txt", "r") as file:
+        word_list = file.readlines()
+
+    # stripping white space and adding words to Trie, and dictionary;
+    # dictionary used to reduce the search space of any anagram look up 
+    # for a certain permutation of chars in our choice word;
+    # there is a build function based on a list of words but I wanted to
+    # strip each word and allow for words that are too large to be
+    # omitted from the Trie
+    for word in word_list:
+        word = word.strip()
+
+        # only allowing words that are longer than 2 chars and shorter than
+        # the word we're trying to anagram
+        if len(word) <= len(word_to_anagram) and len(word) > SCRABBLE_START:
+            word_dict[len(word)].append(word)
+            oxford.add(word)
+    
+    # helper function allowing us to find permutations;
+    # python is all pass-by-reference so this works fine
+    find_anagram_words(oxford, t, sorted(word_to_anagram), "")
+
+    anagrams = []
+
+    for key in word_dict.keys():
+        for word in word_dict[key]:
+            if t.contains(word):
+                anagrams.append(word)
+
+    print(f"Here are your anagrams for {word_to_anagram}\n{anagrams}")
+
+
+def find_anagram_words(oxford, t, word_to_anagram, text):
+
+    for i in range(0, len(word_to_anagram), 1):
+        text1 = text + word_to_anagram[i]
+        if oxford.contains(text1) and not t.contains(text1):
+            t.add(text1)
+            text2 = word_to_anagram[0:i] + word_to_anagram[i + 1:]
+            find_anagram_words(oxford, t, text2, text1)
+
+    
+
+# this game sets a parameter and allows you to find all the anagrams
+# of a certain length
+def wordscape():
+    pass
 
 if __name__ == "__main__":
-    anagrams()
+    anagrams_trie()
