@@ -17,10 +17,13 @@
               <div class="header-text caption">
                 <h2>Anagrams</h2>
                 <div id="search-section">
-                    <form id="suggestion_form" name="gs" method="get" action="#">
+                  
+                    <!--<form id="suggestion_form" name="gs" method="get" action="#">-->
+                      <form method="post" enctype='multipart/form-data'>{% csrf_token %}
+                        {{ form.non_field_errors }}
                   <div class="searchText">
                     
-                    <input type="text" name="q" class="searchText" placeholder="Enter your letters here..." autocomplete="off">
+                    <input type="text" name="anagrams_letters" id="anagrams_letters" class="searchText" placeholder="Enter your letters here..." autocomplete="off">
                     <!--<ul>
                       <li><label><input type="checkbox" name="ext_com" value="1"><span>.com <em>($10/yr)</em></span></label></li>
                       <li><label><input type="checkbox" name="ext_net" value="1"><span>.net <em>($12/yr)</em></span></label></li>
@@ -28,7 +31,7 @@
                       <li><label><input type="checkbox" name="ext_in" value="1"><span>.in <em>($6/yr)</em></span></label></li>
                     </ul>-->
                   </div>
-                      <input type="submit" name="results" class="main-button" value="Search Now">
+                      <input type="submit" name="submit" class="main-button" value="Search Now">
                    </form>
                  <div class="advSearch_chkbox">
                  </div>
@@ -50,7 +53,7 @@
               </div>
             </div>
             <div class="col-md-12">
-                Description of Anagrams
+              Anagrams (also published under names including Anagram, Snatch and Word Making and Taking) is a tile-based word game that involves rearranging letter tiles to form words. The game pieces are a set of tiles with letters on one side. Tiles are shuffled face-down then turned over one by one, players forming words by combining them with existing words, their own or others'. The game has never been standardized and there are many varieties of sets and rules. Anagrams is often played with tiles from another word game, such as Scrabble or Bananagrams.
             </div>
           </div>
         </div>
@@ -66,7 +69,9 @@
               <div class="section-heading">
                 <span>Anagrams</span>
                 <h2>Results</h2>
-                <p>Host Cloud is a professional Bootstrap 4 template by TemplateMo for your hosting company websites. There are 4 HTML pages included in this template. You can feel free to customize anything. Please share this template to your friends. Thank you.</p>
+                {% for word in anagrams_results %}
+                <p>{{ word }}</p>
+                {% endfor %}
               </div>
             </div>
           </div>
