@@ -1,4 +1,3 @@
-from gettext import npgettext
 import multiprocessing as mp
 from multiprocessing.dummy import Process, Manager
 from re import I
@@ -29,6 +28,7 @@ SCRABBLE_LETTER_SCORES = {"A": 1, "E": 1, "I": 1, "O": 1, "U": 1, "L": 1, "N": 1
 # Wordle --> DONE
 # Anagrams --> DONE
 # Boggle / WordHunt
+# WordBrain (superset of Boggle functionality)
 # Wordscape --> DONE
 
 def main_scrabble():
