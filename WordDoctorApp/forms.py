@@ -1,5 +1,5 @@
 from django import forms
-from .models import Anagrams
+from .models import Anagrams, Wordscape
 
 class AnagramsForm(forms.ModelForm):
     class Meta:
@@ -7,3 +7,11 @@ class AnagramsForm(forms.ModelForm):
         fields = (
             'anagrams_letters',
             )
+
+class WordscapeForm(forms.ModelForm):
+    class Meta:
+        model = Wordscape
+        fields = (
+            'wordscape_letters',
+            'wordscape_length',
+        )

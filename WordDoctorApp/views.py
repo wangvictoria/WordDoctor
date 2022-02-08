@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import AnagramsForm
+from .forms import AnagramsForm, WordscapeForm
 
 from gettext import npgettext
 import multiprocessing as mp
@@ -103,6 +103,44 @@ def boggle(request):
 
 def wordscape(request):
     context = {}
+    form = WordscapeForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            wordscape_chars = form.cleaned_data.get('wordscape_letters').strip().lower()
+            word_size = form.cleaned_data.get('wordscape_length')
+
+            # oxford will have the entire applicable dictionary of related words within it
+            oxford = Trie()
+
+            # t will be the Trie to which we add words which are anagrams
+            t = Trie()
+
+            # word_search_space will be all applicable words of a certain size 
+            word_search_space = []
+
+            with open("words.txt") as file:
+                word_list = file.readlines()
+
+            for word in word_list:
+                word = word.strip()
+
+                # only allowing words that are longer than 2 chars and shorter than
+                # the word we're trying to anagram
+                if len(word) == word_size:                  # FIXME: DOESN'T WORK WITHOUT OPTIONAL WORD LENGTH
+                    word_search_space.append(word)
+                    oxford.add(word)
+            
+            find_anagram_words(oxford, t, sorted(wordscape_chars), "")
+
+            wordscapes_solutions = []
+
+            for word in word_search_space:
+                if t.contains(word):
+                    wordscapes_solutions.append(word)
+            
+            context['wordscape_results'] = wordscapes_solutions
+    
     return render(request, 'wordscape.html', context)
 
 def general(request):

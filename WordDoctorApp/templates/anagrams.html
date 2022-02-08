@@ -17,9 +17,10 @@
               <div class="header-text caption">
                 <h2>Anagrams</h2>
                 <div id="search-section">
-                  {{ form.non_field_errors }}
+                  
                     <!--<form id="suggestion_form" name="gs" method="get" action="#">-->
                       <form method="post" enctype='multipart/form-data'>{% csrf_token %}
+                        {{ form.non_field_errors }}
                   <div class="searchText">
                     
                     <input type="text" name="anagrams_letters" id="anagrams_letters" class="searchText" placeholder="Enter your letters here..." autocomplete="off">

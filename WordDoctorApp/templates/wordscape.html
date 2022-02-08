@@ -15,12 +15,16 @@
           <div class="row">
             <div class="col-md-8 offset-md-2">
               <div class="header-text caption">
-                <h2>WordScape</h2>
+                <h2>WordScapes</h2>
                 <div id="search-section">
-                    <form id="suggestion_form" name="gs" method="get" action="#">
+                  
+                  <!--<form id="suggestion_form" name="gs" method="get" action="#">-->
+                    <form method="post" enctype='multipart/form-data'>{% csrf_token %}
+                      {{ form.non_field_errors }}
                   <div class="searchText">
                     
-                    <input type="text" name="q" class="searchText" placeholder="Enter your letters here..." autocomplete="off">
+                    <input type="text" name="wordscape_letters" class="searchText" placeholder="Enter your letters here..." autocomplete="off">
+                    <input type="text" name="wordscape_length" class="searchText" placeholder="(Optional) Word Length" autocomplete="off">
                     <!--<ul>
                       <li><label><input type="checkbox" name="ext_com" value="1"><span>.com <em>($10/yr)</em></span></label></li>
                       <li><label><input type="checkbox" name="ext_net" value="1"><span>.net <em>($12/yr)</em></span></label></li>
@@ -28,7 +32,7 @@
                       <li><label><input type="checkbox" name="ext_in" value="1"><span>.in <em>($6/yr)</em></span></label></li>
                     </ul>-->
                   </div>
-                      <input type="submit" name="results" class="main-button" value="Search Now">
+                      <input type="submit" name="submit" class="main-button" value="Search Now">
                    </form>
                  <div class="advSearch_chkbox">
                  </div>
@@ -46,7 +50,7 @@
           <div class="row">
             <div class="col-md-12">
               <div class="trusted-section-heading">
-                <a href="#"><h4>WORDSCAPE</h4></a>
+                <a href="#"><h4>WORDSCAPES</h4></a>
               </div>
             </div>
             <div class="col-md-12">
@@ -64,9 +68,11 @@
           <div class="row">
             <div class="col-md-12">
               <div class="section-heading">
-                <span>WordScape</span>
+                <span>WordScapes</span>
                 <h2>Results</h2>
-                <p>Host Cloud is a professional Bootstrap 4 template by TemplateMo for your hosting company websites. There are 4 HTML pages included in this template. You can feel free to customize anything. Please share this template to your friends. Thank you.</p>
+                {% for word in wordscape_results %}
+                <p>{{ word }}</p>
+                {% endfor %}
               </div>
             </div>
           </div>

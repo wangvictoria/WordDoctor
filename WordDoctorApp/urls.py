@@ -7,5 +7,5 @@ urlpatterns = [
     path('scrabble/', views.scrabble, name='scrabble'),
     path('anagrams/', views.anagrams, name='anagrams'),
     path('boggle/', views.boggle, name='boggle'),
-    path('wordscape/', views.wordscape, name='wordscape'),
+    path('wordscapes/', views.wordscape, name='wordscape'),
 ]

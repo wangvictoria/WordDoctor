@@ -4,3 +4,7 @@ from django.db import models
 
 class Anagrams(models.Model):
     anagrams_letters = models.CharField(max_length=10)
+
+class Wordscape(models.Model):
+    wordscape_letters = models.CharField(max_length=10)
+    wordscape_length = models.IntegerField(blank=True, null=True)
