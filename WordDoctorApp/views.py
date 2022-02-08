@@ -49,54 +49,46 @@ def anagrams(request):
             
             word_list = None
 
-            # going through scrabble dictionary to use this as the basis for finding anagrams
-            with open("ospd.txt") as file:
-                word_list = file.readlines()
+            # oxford will have the entire applicable dictionary of related words within it
+            oxford = Trie()
 
-            # converting word_arr for ease of manipulation
-            word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, len(word_to_anagram) + 1, 1)])
+            # t will be the Trie to which we add words which are anagrams
+            t = Trie()
+
+            word_dict = dict.fromkeys([num for num in range(SCRABBLE_START + 1, len(word_to_anagram) + 1, 1)])
 
             for key in word_dict.keys():
                 word_dict[key] = []
-            
+
+            # going through scrabble dictionary to use this as the basis for finding anagrams
+            with open("words.txt") as file:
+                word_list = file.readlines()
+
             # stripping white space and adding words to Trie, and dictionary;
             # dictionary used to reduce the search space of any anagram look up 
-            # for a certain permutation of chars in our choice word
+            # for a certain permutation of chars in our choice word;
+            # there is a build function based on a list of words but I wanted to
+            # strip each word and allow for words that are too large to be
+            # omitted from the Trie
             for word in word_list:
                 word = word.strip()
-                if len(word) <= len(word_to_anagram):
+
+                # only allowing words that are longer than 2 chars and shorter than
+                # the word we're trying to anagram
+                if len(word) <= len(word_to_anagram) and len(word) > SCRABBLE_START:
                     word_dict[len(word)].append(word)
+                    oxford.add(word)
             
-            # finding what amounts to the powerset of the word's chars to
-            # find out whether each combination of words counts as an actual
-            # word in the OSPD
-            word_to_anagram_combinations = []
-            for i in range(SCRABBLE_START, len(word), 1):
-                for combo in it.combinations(word_to_anagram.strip().lower(), i):
-                    word_to_anagram_combinations.append("".join(combo))
-            
-            word_to_anagram_permutations = []
+            # helper function allowing us to find permutations;
+            # python is all pass-by-reference so this works fine
+            find_anagram_words(oxford, t, sorted(word_to_anagram), "")
 
-            for word in word_to_anagram_combinations:
-                word_to_anagram_permutations += list(it.permutations(word))
-            
-            word_to_anagram_permutations_strings = []
-
-            for word in word_to_anagram_permutations:
-                word_to_anagram_permutations_strings.append("".join(word))
-
-            # eliminating duplicates
-            word_to_anagram_permutations_strings = list(set(word_to_anagram_permutations_strings))
-            
             anagrams = []
 
-            # checking to see if all anagrams combos are a valid word in the OSPD,
-            # and therefore if it is a valid anagram
-            for word in word_to_anagram_permutations_strings:
-                if word in word_dict[len(word)]:
-                    anagrams.append(word)
-
-            anagrams = sorted(list(set(anagrams)), key=len)
+            for key in word_dict.keys():
+                for word in word_dict[key]:
+                    if t.contains(word):
+                        anagrams.append(word)
 
             context['anagrams_results'] = anagrams
 
