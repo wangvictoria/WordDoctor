@@ -91,6 +91,7 @@ def anagrams(request):
                         anagrams.append(word)
 
             context['anagrams_results'] = anagrams
+            context['anagrams_letters'] = word_to_anagram
 
         else:
             form = AnagramsForm(request.POST or None)
@@ -140,6 +141,7 @@ def wordscape(request):
                     wordscapes_solutions.append(word)
             
             context['wordscape_results'] = wordscapes_solutions
+            context['wordscape_letters'] = wordscape_chars
     
     return render(request, 'wordscape.html', context)
 

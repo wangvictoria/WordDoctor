@@ -68,7 +68,10 @@
             <div class="col-md-12">
               <div class="section-heading">
                 <span>Anagrams</span>
-                <h2>Results</h2>
+                <h2>Results
+                {% if anagrams_letters %}
+                 for '{{ anagrams_letters }}'
+                {% endif %}</h2>
                 {% for word in anagrams_results %}
                 <p>{{ word }}</p>
                 {% endfor %}

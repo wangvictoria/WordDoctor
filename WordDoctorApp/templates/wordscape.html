@@ -69,7 +69,10 @@
             <div class="col-md-12">
               <div class="section-heading">
                 <span>WordScapes</span>
-                <h2>Results</h2>
+                <h2>Results
+                  {% if wordscape_letters %}
+                   for '{{ wordscape_letters }}'
+                  {% endif %}</h2>
                 {% for word in wordscape_results %}
                 <p>{{ word }}</p>
                 {% endfor %}
