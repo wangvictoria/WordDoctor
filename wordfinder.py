@@ -87,30 +87,30 @@ def main_scrabble():
                 print(f'There are no words of size {i} with the requested letters out of order.\n')
                 
 
-def scrabble_sequential(word_dict_sequential, chars_on_board_set, substr, word_list): 
+# def scrabble_sequential(word_dict_sequential, chars_on_board_set, substr, word_list): 
 
-    for word in word_list:
-        word = word.strip()
-        if substr in word:
-            a = word_dict_sequential[len(word)]
-            a = np.append(a, word)
-            word_dict_sequential[len(word)] = a
+#     for word in word_list:
+#         word = word.strip()
+#         if substr in word:
+#             a = word_dict_sequential[len(word)]
+#             a = np.append(a, word)
+#             word_dict_sequential[len(word)] = a
 
 
-    # sequential word processing
-    for key in word_dict_sequential.keys():
-        for word in word_dict_sequential[key]:
-            for i in range(0, len(chars_on_board_set), 1):
-                if chars_on_board_set[i] in word:
-                    break
-                if i == len(chars_on_board_set) - 1:
-                    a = word_dict_sequential[len(word)]
-                    for i in range(0, len(a, 1)):
-                        if a[i] == word:
-                            a = np.delete(a, i)
-                            break
-                    word_dict_sequential[len(word)] = a
-    print (word_dict_sequential)
+#     # sequential word processing
+#     for key in word_dict_sequential.keys():
+#         for word in word_dict_sequential[key]:
+#             for i in range(0, len(chars_on_board_set), 1):
+#                 if chars_on_board_set[i] in word:
+#                     break
+#                 if i == len(chars_on_board_set) - 1:
+#                     a = word_dict_sequential[len(word)]
+#                     for i in range(0, len(a, 1)):
+#                         if a[i] == word:
+#                             a = np.delete(a, i)
+#                             break
+#                     word_dict_sequential[len(word)] = a
+#     print (word_dict_sequential)
 
 
 def scrabble_out_of_order(word_dict_out_of_order, chars_on_board_set, substr, word_list):
@@ -365,22 +365,22 @@ def boggle_and_wordhunt():
 
     boggle_list = []
 
-    for word in boggle_list:
-        print(f"{word} --> score: {find_boggle_score(word)}")
+    for word in boggle_list.sort(key=len):
+        print(f"{word}")
 
-def find_boggle_score(word):
-    if len(word) < 3:
-        return 0
-    elif len(word) < 5:
-        return 1
-    elif len(word) < 6:
-        return 2
-    elif len(word) < 7:
-        return 3
-    elif len(word) < 8:
-        return 4
-    else:
-        return 11
+# def find_boggle_score(word):
+#     if len(word) < 3:
+#         return 0
+#     elif len(word) < 5:
+#         return 1
+#     elif len(word) < 6:
+#         return 2
+#     elif len(word) < 7:
+#         return 3
+#     elif len(word) < 8:
+#         return 4
+#     else:
+#         return 11
 
 if __name__ == "__main__":
     anagrams_trie()
