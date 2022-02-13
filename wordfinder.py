@@ -1,11 +1,9 @@
-import multiprocessing as mp
-from multiprocessing.dummy import Process, Manager
 from re import I
 from python_datastructures import Trie
 import numpy as np
 import itertools as it
 
-SCRABBLE_START = 2
+SCRABBLE_START = 3
 SCRABBLE_END = 15
 WORDLE_LEN = 5
 ALPHABET_START = 1
@@ -13,10 +11,10 @@ ALPHABET_END = 26
 BOGGLE_SIDE_LEN = 4
 BOGGLE_WORD_MAX = 4
 PATH = "/Users/shaneausmus/Desktop/Vandy Course Materials/Spring 2022/CS 4279/WordDoctor"
-SCRABBLE_LETTER_SCORES = {"A": 1, "E": 1, "I": 1, "O": 1, "U": 1, "L": 1, "N": 1,
-                        "S": 1, "T": 1, "R": 1, "D": 2, "G": 2, "B": 3, "C": 3,
-                        "M": 3, "P": 3, "F": 4, "H": 4, "V": 4, "W": 4, "Y": 4,
-                        "K": 5, "J": 8, "X": 8, "Q": 10, "Z": 10} 
+SCRABBLE_LETTER_SCORES = {"a": 1, "e": 1, "i": 1, "o": 1, "u": 1, "l": 1, "n": 1,
+                        "s": 1, "t": 1, "r": 1, "d": 2, "g": 2, "b": 3, "c": 3,
+                        "m": 3, "p": 3, "f": 4, "h": 4, "v": 4, "w": 4, "y": 4,
+                        "k": 5, "j": 8, "x": 8, "q": 10, "z": 10} 
 
 # Thinking about trying to time how long finding characters in all the words would take in
 # Python with multi-threading and with the standard approach I outline below using one of
@@ -36,55 +34,32 @@ def main_scrabble():
     chars_on_board = input("Enter open characters on board you think have potential: ")
     with open(f"{PATH}/ospd.txt", "r") as file:
         
-        mp.set_start_method('spawn')
-        manager = mp.Manager()
 
         word_list = file.readlines()
         substr = "".join(user_chars)
 
         chars_on_board_set = "".join(set(chars_on_board))
 
-        word_dict_sequential = manager.dict()
+        word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, SCRABBLE_END + 1, 1)])
         for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-            word_dict_sequential[i] = np.array([])
+            word_dict[i] = np.array([])
 
-        word_dict_out_of_order = manager.dict()
-        for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-            word_dict_out_of_order[i] = np.array([])
+        # word_dict_out_of_order = manager.dict()
+        # for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
+        #     word_dict_out_of_order[i] = np.array([])
 
-        t1 = mp.Process(target=scrabble_sequential, args=(word_dict_sequential,
-                                                                            chars_on_board_set,
-                                                                            substr,
-                                                                            word_list))
-        t2 = mp.Process(target=scrabble_out_of_order, args=(word_dict_out_of_order,
-                                                                                chars_on_board_set,
-                                                                                substr,
-                                                                                word_list))
-        
-        t1.start()
-        t2.start()
-
-        t1.join()
-        t2.join()
-
-        print(word_dict_sequential)
-        print(word_dict_out_of_order)
+        scrabble_processing(word_dict, chars_on_board_set, substr, word_list)
+                                                                    
+        print(word_dict)
 
         print("\n\nFinding your words...\n")
         for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-            if word_dict_sequential[i]:
+            if word_dict[i]:
                 print(f'Words of size {i} with your letters (sequentially):')
-                print(*word_dict_sequential[i], sep='\n')
+                print(*word_dict[i], sep=', ')
                 print()
             else:
                 print(f'There are no words of size {i} with the requested letters sequentially.\n')
-
-            if word_dict_out_of_order[i]:
-                print(f'Potential words with requested letters (out-of-order):')
-                print(*word_dict_out_of_order, sep='\n')
-                print()
-            else:
-                print(f'There are no words of size {i} with the requested letters out of order.\n')
                 
 
 # def scrabble_sequential(word_dict_sequential, chars_on_board_set, substr, word_list): 
@@ -113,7 +88,7 @@ def main_scrabble():
 #     print (word_dict_sequential)
 
 
-def scrabble_out_of_order(word_dict_out_of_order, chars_on_board_set, substr, word_list):
+def scrabble_processing(word_dict, chars_on_board_set, substr, word_list):
 
     for word in word_list:
         word = word.strip()
@@ -121,25 +96,23 @@ def scrabble_out_of_order(word_dict_out_of_order, chars_on_board_set, substr, wo
             if substr[i] not in word:
                 break
             if i == len(substr) - 1:
-                a = word_dict_out_of_order[len(word)]
+                a = word_dict[len(word)]
                 a = np.append(a, word)
-                word_dict_out_of_order[len(word)] = a
+                word_dict[len(word)] = a
                 
     # out_of_order word processing
-    for key in word_dict_out_of_order.keys():
-        for word in word_dict_out_of_order[key]:
+    for key in word_dict.keys():
+        for word in word_dict[key]:
             for i in range(0, len(chars_on_board_set), 1):
                 if chars_on_board_set[i] in word:
                     break
                 if i == len(chars_on_board_set) - 1:
-                    a = word_dict_out_of_order[len(word)]
+                    a = word_dict[len(word)]
                     for i in range(0, len(a, 1)):
                         if a[i] == word:
                             a = np.delete(a, i)
                             break
-                    word_dict_out_of_order[len(word)] = a
-
-    print (word_dict_out_of_order)
+                    word_dict[len(word)] = a
 
 
 def wordle():
@@ -257,11 +230,13 @@ def anagrams_trie():
     # t will be the Trie to which we add words which are anagrams
     t = Trie()
 
-    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START + 1, len(word_to_anagram) + 1, 1)])
-
+    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, len(word_to_anagram) + 1, 1)])
+    anagrams_solutions = dict.fromkeys([num for num in range(SCRABBLE_START, len(word_to_anagram) + 1, 1)])
     for key in word_dict.keys():
         word_dict[key] = []
+        anagrams_solutions[key] = []
 
+    print("Processing dictionary...\n\n")
     # going through scrabble dictionary to use this as the basis for finding anagrams
     with open(f"{PATH}/words.txt", "r") as file:
         word_list = file.readlines()
@@ -277,22 +252,28 @@ def anagrams_trie():
 
         # only allowing words that are longer than 2 chars and shorter than
         # the word we're trying to anagram
-        if len(word) <= len(word_to_anagram) and len(word) > SCRABBLE_START:
+        if len(word) <= len(word_to_anagram) and len(word) >= SCRABBLE_START:
             word_dict[len(word)].append(word)
             oxford.add(word)
     
+    print("\n\nFinding your words...\n\n")
     # helper function allowing us to find permutations;
     # python is all pass-by-reference so this works fine
     find_anagram_words(oxford, t, sorted(word_to_anagram), "")
 
-    anagrams = []
-
     for key in word_dict.keys():
         for word in word_dict[key]:
             if t.contains(word):
-                anagrams.append(word)
+                anagrams_solutions[len(word)].append(word)
 
-    print(f"Here are your anagrams for {word_to_anagram}\n{anagrams}")
+    for i in range(SCRABBLE_START, len(word_to_anagram) + 1, 1):
+        if anagrams_solutions[i]:
+            print(f'\nPotential anagrams of {word_to_anagram} with {i} characters:')
+            print(*anagrams_solutions[i], sep=', ')
+            print()
+        else:
+            print(f'\nThere are no anagrams of {word_to_anagram} with {i} characters')
+
 
 def find_anagram_words(oxford, t, word_to_anagram, text):
 
@@ -305,9 +286,27 @@ def find_anagram_words(oxford, t, word_to_anagram, text):
 
 # this game is like anagrams but sets a parameter and allows you
 # to find all the anagrams of a certain length
-def wordscape():
+def wordscapes():
     wordscape_chars = input("Enter your wordscape characters: ").strip().lower()
-    word_size = int(input("What size word are you looking for? Enter a number: ").strip())
+
+    length_check = False
+
+    while True:
+        try:
+            user_input = input("Do you want words of only a specific length? (Enter y/n): ")
+            u = user_input.strip().lower()
+            if u == "y" or u == "yes":
+                length_check = True
+                break
+            elif u == "n" or u == "no":
+                break
+            else:
+                print("Incorrect input - please enter y/n\n")
+        except ValueError:
+            print("Incorrect input - please enter y/n\n")
+
+    if length_check:
+        word_size = int(input("What size word are you looking for? Enter a number: ").strip())
 
     # oxford will have the entire applicable dictionary of related words within it
     oxford = Trie()
@@ -321,24 +320,39 @@ def wordscape():
     with open(f"{PATH}/words.txt", "r") as file:
         word_list = file.readlines()
 
+    print("\n\nProcessing dictionary...\n")
     for word in word_list:
         word = word.strip()
 
         # only allowing words that are longer than 2 chars and shorter than
         # the word we're trying to anagram
-        if len(word) == word_size:
-            word_search_space.append(word)
-            oxford.add(word)
-    
+        if (length_check and len(word) == word_size) or not length_check:
+            if len(word) >= SCRABBLE_START:
+                word_search_space.append(word)
+                oxford.add(word)
+                
+    print("\n\nFinding your words...\n")
     find_anagram_words(oxford, t, sorted(wordscape_chars), "")
 
-    wordscapes_solutions = []
+    wordscapes_solutions = dict.fromkeys([num for num in range(SCRABBLE_START, len(wordscape_chars) + 1, 1)])
+
+    for key in wordscapes_solutions.keys():
+        wordscapes_solutions[key] = []
 
     for word in word_search_space:
         if t.contains(word):
-            wordscapes_solutions.append(word)
+            if (length_check and len(word) == word_size) or not length_check:
+                wordscapes_solutions[len(word)].append(word)
 
-    print(f"Here are your anagrams for {wordscape_chars}\n{wordscapes_solutions}")
+    for i in range(SCRABBLE_START, len(wordscape_chars) + 1, 1):
+        if wordscapes_solutions[i]:
+            print(f'Potential wordscape words of {i} characters with your letters:')
+            print(*wordscapes_solutions[i], sep=', ')
+            print()
+        else:
+            print(f'There are no words with {i} characters and the requested letters\n')
+
+
 
 def boggle_and_wordhunt():
     boggle_board = []
@@ -383,4 +397,4 @@ def boggle_and_wordhunt():
 #         return 11
 
 if __name__ == "__main__":
-    anagrams_trie()
+    wordscapes()
