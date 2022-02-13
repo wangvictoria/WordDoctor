@@ -10,7 +10,6 @@ ALPHABET_START = 1
 ALPHABET_END = 26
 BOGGLE_SIDE_LEN = 4
 BOGGLE_WORD_MAX = 4
-PATH = "/Users/shaneausmus/Desktop/Vandy Course Materials/Spring 2022/CS 4279/WordDoctor"
 SCRABBLE_LETTER_SCORES = {"a": 1, "e": 1, "i": 1, "o": 1, "u": 1, "l": 1, "n": 1,
                         "s": 1, "t": 1, "r": 1, "d": 2, "g": 2, "b": 3, "c": 3,
                         "m": 3, "p": 3, "f": 4, "h": 4, "v": 4, "w": 4, "y": 4,
@@ -32,7 +31,7 @@ SCRABBLE_LETTER_SCORES = {"a": 1, "e": 1, "i": 1, "o": 1, "u": 1, "l": 1, "n": 1
 def main_scrabble():
     user_chars = input("Enter your characters: ")
     chars_on_board = input("Enter open characters on board you think have potential: ")
-    with open(f"{PATH}/ospd.txt", "r") as file:
+    with open("ospd.txt", "r") as file:
         
 
         word_list = file.readlines()
@@ -116,46 +115,53 @@ def scrabble_processing(word_dict, chars_on_board_set, substr, word_list):
 
 
 def wordle():
-    while True:
-            try:
-                char_list = input("Enter characters: ")
-                if len(char_list) > WORDLE_LEN or len(char_list) <= 0:
-                    print("Wordle words must be less than or equal to 5 characters; try again!")
-                else:
-                    break
-            except ValueError:
-                print("This input does not meet the required 1 to 5 characters for a Wordle word")
 
+    char_locations = []
+    char_list = ['a', 'b', 'c', 'd', 'e', 'f']
+    while(len(char_locations) != 5):
+        char_locations = input("Enter locations of letters with unknown letters as underscores: ")
 
-    with open(f"{PATH}/wordle.txt", "r") as file:
+    num_known_characters = 0
+    for i in range(0, WORDLE_LEN, 1):
+                if char_locations[i] != "_":
+                    num_known_characters = num_known_characters + 1
+
+    while(len(char_list) + num_known_characters > WORDLE_LEN):
+        char_list = input("Enter characters: ")
+    
+
+    with open("wordle.txt", "r") as file:
         word_list = file.readlines()
-        substr = "".join(char_list)
 
-        words_with_in_order_chars = []
-        words_with_out_of_order_chars = []
+        wordle_solutions = []
+
 
         # performing search for sequences of letters in order
         for word in word_list:
+            valid = True
             word = word.strip()
-            if substr in word:
-                words_with_in_order_chars.append(word)
-            for i in range(0, len(char_list), 1):
-                if char_list[i] not in word:
-                    break
-                if i == len(char_list) - 1:
-                    words_with_out_of_order_chars.append(word)
+            for j in range(0, WORDLE_LEN, 1):
+                if char_locations[j] != "_":
+                    if word[j] != char_locations[j]:
+                        valid = False
+            if valid:
+                if len(char_list) == 0:
+                    wordle_solutions.append(word)
+                else:
+                    for i in range(0, len(char_list), 1):
+                        if char_list[i] not in word:
+                            break
+                        if i == len(char_list) - 1:
+                            wordle_solutions.append(word)
                 
-        if words_with_in_order_chars:
-            print(f'Potential Wordle words with requested letters (sequentially):')
-            print(*words_with_in_order_chars, sep='\n')
-            print()
-        if words_with_out_of_order_chars:
-            print(f'Potential Wordle words with requested letters (out-of-order):')
-            print(*words_with_out_of_order_chars, sep='\n')
-            print()
             
-        if not words_with_in_order_chars and not words_with_out_of_order_chars:
-            print(f'There are no words with the requested letter sequence.\n')
+
+        if wordle_solutions:
+            print('Potential Wordle words with requested letters:')
+            print(*wordle_solutions, sep=", ")
+            print()
+        else:
+            print('There are no words with the requested letters.\n')
 
 
 def anagrams():
@@ -165,7 +171,7 @@ def anagrams():
     word_list = None
 
     # going through scrabble dictionary to use this as the basis for finding anagrams
-    with open(f"{PATH}/ospd.txt", "r") as file:
+    with open("ospd.txt", "r") as file:
         word_list = file.readlines()
 
     # converting word_arr for ease of manipulation
@@ -238,7 +244,7 @@ def anagrams_trie():
 
     print("Processing dictionary...\n\n")
     # going through scrabble dictionary to use this as the basis for finding anagrams
-    with open(f"{PATH}/words.txt", "r") as file:
+    with open("words.txt", "r") as file:
         word_list = file.readlines()
 
     # stripping white space and adding words to Trie, and dictionary;
@@ -317,7 +323,7 @@ def wordscapes():
     # word_search_space will be all applicable words of a certain size 
     word_search_space = []
 
-    with open(f"{PATH}/words.txt", "r") as file:
+    with open("words.txt", "r") as file:
         word_list = file.readlines()
 
     print("\n\nProcessing dictionary...\n")
@@ -362,7 +368,7 @@ def boggle_and_wordhunt():
 
     word_list = []
 
-    with open(f"{PATH}/words.txt", "r") as file:
+    with open("words.txt", "r") as file:
         word_list = file.readlines()
 
     word_dict = dict.fromkeys([num for num in range(SCRABBLE_START + 1, BOGGLE_WORD_MAX + 1, 1)])
@@ -397,4 +403,4 @@ def boggle_and_wordhunt():
 #         return 11
 
 if __name__ == "__main__":
-    wordscapes()
+    wordle()
