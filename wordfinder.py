@@ -35,19 +35,15 @@ def main_scrabble():
         
 
         word_list = file.readlines()
-        substr = "".join(user_chars)
 
+        user_chars = "".join(set(user_chars))
         chars_on_board_set = "".join(set(chars_on_board))
 
         word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, SCRABBLE_END + 1, 1)])
         for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-            word_dict[i] = np.array([])
+            word_dict[i] = []
 
-        # word_dict_out_of_order = manager.dict()
-        # for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-        #     word_dict_out_of_order[i] = np.array([])
-
-        scrabble_processing(word_dict, chars_on_board_set, substr, word_list)
+        scrabble_processing(word_dict, chars_on_board_set, word_list)
                                                                     
         print(word_dict)
 
@@ -59,59 +55,21 @@ def main_scrabble():
                 print()
             else:
                 print(f'There are no words of size {i} with the requested letters sequentially.\n')
-                
-
-# def scrabble_sequential(word_dict_sequential, chars_on_board_set, substr, word_list): 
-
-#     for word in word_list:
-#         word = word.strip()
-#         if substr in word:
-#             a = word_dict_sequential[len(word)]
-#             a = np.append(a, word)
-#             word_dict_sequential[len(word)] = a
 
 
-#     # sequential word processing
-#     for key in word_dict_sequential.keys():
-#         for word in word_dict_sequential[key]:
-#             for i in range(0, len(chars_on_board_set), 1):
-#                 if chars_on_board_set[i] in word:
-#                     break
-#                 if i == len(chars_on_board_set) - 1:
-#                     a = word_dict_sequential[len(word)]
-#                     for i in range(0, len(a, 1)):
-#                         if a[i] == word:
-#                             a = np.delete(a, i)
-#                             break
-#                     word_dict_sequential[len(word)] = a
-#     print (word_dict_sequential)
-
-
-def scrabble_processing(word_dict, chars_on_board_set, substr, word_list):
+def scrabble_processing(word_dict, chars_on_board_set, word_list):
 
     for word in word_list:
         word = word.strip()
-        for i in range(0, len(substr), 1):
+        for i in range(0, len(word), 1):
+            for j in range(0, chars_on_board_set, 1):
+                if a[i] == word:
+                    a = np.delete(a, i)
+                        break
             if substr[i] not in word:
                 break
             if i == len(substr) - 1:
-                a = word_dict[len(word)]
-                a = np.append(a, word)
-                word_dict[len(word)] = a
-                
-    # out_of_order word processing
-    for key in word_dict.keys():
-        for word in word_dict[key]:
-            for i in range(0, len(chars_on_board_set), 1):
-                if chars_on_board_set[i] in word:
-                    break
-                if i == len(chars_on_board_set) - 1:
-                    a = word_dict[len(word)]
-                    for i in range(0, len(a, 1)):
-                        if a[i] == word:
-                            a = np.delete(a, i)
-                            break
-                    word_dict[len(word)] = a
+                word_dict[len(word)].append(word)
 
 
 def wordle():
@@ -129,14 +87,35 @@ def wordle():
     while(len(char_list) + num_known_characters > WORDLE_LEN):
         char_list = input("Enter characters: ")
     
+    check_for_invalid_letters = ""
+    invalid_chars = ""
+    
+    # optional prompting to allow for users to enter letters that they know are invalid
+    input_valid_for_invalid_letters = False
+    check_for_invalid_letters = input("Do you want to enter characters that you know are invalid? (y/n) ").strip().lower()
+    while not input_valid_for_invalid_letters:
+        if check_for_invalid_letters == "n" or check_for_invalid_letters == "no":
+            input_valid_for_invalid_letters = True
+            break
+        elif check_for_invalid_letters == "y" or check_for_invalid_letters == "yes":
+            input_valid_for_invalid_letters = True
+
+            # using set feature to eliminate letters that were entered multiple times and reduce them to one letter
+            invalid_chars = list(set(input("Enter characters that you know are invalid: ").strip().lower()))
+        else:
+            check_for_invalid_letters = input("Invalid input - Do you want to enter characters that you know are invalid? (y/n) ").strip().lower()
+    
+    print(invalid_chars)
+    if len(invalid_chars) == 0:
+        check_for_invalid_letters = False
+
 
     with open("wordle.txt", "r") as file:
         word_list = file.readlines()
 
+        # array holding all applicable words
         wordle_solutions = []
 
-
-        # performing search for sequences of letters in order
         for word in word_list:
             valid = True
             word = word.strip()
@@ -153,15 +132,27 @@ def wordle():
                             break
                         if i == len(char_list) - 1:
                             wordle_solutions.append(word)
-                
-            
 
-        if wordle_solutions:
-            print('Potential Wordle words with requested letters:')
-            print(*wordle_solutions, sep=", ")
-            print()
-        else:
-            print('There are no words with the requested letters.\n')
+    filtered_wordle_solutions = []
+
+    if invalid_chars:
+        for word in wordle_solutions:
+            for i in range(0, WORDLE_LEN, 1):
+                if word[i] in invalid_chars:
+                    break
+                if i == WORDLE_LEN - 1:
+                    filtered_wordle_solutions.append(word)
+
+    if invalid_chars and filtered_wordle_solutions:
+        print('Potential Wordle words with requested letters:')
+        print(*filtered_wordle_solutions, sep=", ")
+        print()  
+    elif not invalid_chars and wordle_solutions:
+        print('Potential Wordle words with requested letters:')
+        print(*wordle_solutions, sep=", ")
+        print()
+    else:
+        print('There are no words with the requested letters.\n')
 
 
 def anagrams():
