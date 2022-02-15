@@ -65,7 +65,7 @@ def scrabble_processing(word_dict, chars_on_board_set, word_list):
             for j in range(0, chars_on_board_set, 1):
                 if a[i] == word:
                     a = np.delete(a, i)
-                        break
+                    break
             if substr[i] not in word:
                 break
             if i == len(substr) - 1:
