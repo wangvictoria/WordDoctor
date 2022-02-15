@@ -17,10 +17,18 @@
               <div class="header-text caption">
                 <h2>Wordle</h2>
                 <div id="search-section">
-                    <form id="suggestion_form" name="gs" method="get" action="#">
+                    <!--<form id="suggestion_form" name="gs" method="get" action="#">-->
+                      <form method="post" enctype='multipart/form-data'>{% csrf_token %}
+                        {{ form.non_field_errors }}
                   <div class="searchText">
                     
-                    <input type="text" name="q" class="searchText" placeholder="Enter your letters here..." autocomplete="off">
+                    <input type="char" name="wordle_loc1" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
+                    <input type="char" name="wordle_loc2" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
+                    <input type="char" name="wordle_loc3" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
+                    <input type="char" name="wordle_loc4" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
+                    <input type="char" name="wordle_loc5" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
+                    <input type="text" name="wordle_known_letters" class="searchText" placeholder="Enter known letters here..." autocomplete="off">
+                    <input type="text" name="wordle_invalid_letters" class="searchText" placeholder="Enter incorrect letters here..." autocomplete="off">
                     <!--<ul>
                       <li><label><input type="checkbox" name="ext_com" value="1"><span>.com <em>($10/yr)</em></span></label></li>
                       <li><label><input type="checkbox" name="ext_net" value="1"><span>.net <em>($12/yr)</em></span></label></li>
@@ -66,7 +74,19 @@
               <div class="section-heading">
                 <span>Wordle</span>
                 <h2>Results</h2>
-                <p>Host Cloud is a professional Bootstrap 4 template by TemplateMo for your hosting company websites. There are 4 HTML pages included in this template. You can feel free to customize anything. Please share this template to your friends. Thank you.</p>
+                {% if filtered_wordle_solutions %}
+                {% for word in filtered_wordle_solutions %}
+                <p>{{ word }}</p>
+                {% endfor %}
+
+                {% elif wordle_solutions %}
+                {% for word in wordle_solutions %}
+                <p>{{ word }}</p>
+                {% endfor %}
+
+                {% else %}
+                {{ wordle_no_solutions }}
+                {% endif %}
               </div>
             </div>
           </div>

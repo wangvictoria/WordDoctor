@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import AnagramsForm, WordscapeForm
+from .forms import AnagramsForm, WordscapeForm, WordleForm
 
 from gettext import npgettext
 import multiprocessing as mp
@@ -33,6 +33,73 @@ def index(request):
 
 def wordle(request):
     context = {}
+    form = WordleForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+
+            # populate char locations
+            char_locations = []
+            wordle_char_locations(char_locations, form, 'wordle_loc1')
+            wordle_char_locations(char_locations, form, 'wordle_loc2')
+            wordle_char_locations(char_locations, form, 'wordle_loc3')
+            wordle_char_locations(char_locations, form, 'wordle_loc4')
+            wordle_char_locations(char_locations, form, 'wordle_loc5')
+
+            # TODO: fix error checking for user input known characters
+            # num_known_characters = 0
+            # for i in range(0, WORDLE_LEN, 1):
+            #     if char_locations[i] != "_":
+            #         num_known_characters = num_known_characters + 1
+
+            char_list = form.cleaned_data.get('wordle_known_letters')
+
+            check_for_invalid_letters = ""
+            if (form.cleaned_data.get('wordle_invalid_letters') != None):
+                invalid_chars = list(set(form.cleaned_data.get('wordle_invalid_letters').strip().lower()))
+            else:
+                invalid_chars = ""
+            
+            with open("wordle.txt", "r") as file:
+                word_list = file.readlines()
+
+                # array holding all applicable words
+                wordle_solutions = []
+
+                for word in word_list:
+                    valid = True
+                    word = word.strip()
+                    for j in range(0, WORDLE_LEN, 1):
+                        if char_locations[j] != "_":
+                            if word[j] != char_locations[j]:
+                                valid = False
+                    if valid:
+                        if len(char_list) == 0:
+                            wordle_solutions.append(word)
+                        else:
+                            for i in range(0, len(char_list), 1):
+                                if char_list[i] not in word:
+                                    break
+                                if i == len(char_list) - 1:
+                                    wordle_solutions.append(word)
+
+            filtered_wordle_solutions = []
+
+            if invalid_chars:
+                for word in wordle_solutions:
+                    for i in range(0, WORDLE_LEN, 1):
+                        if word[i] in invalid_chars:
+                            break
+                        if i == WORDLE_LEN - 1:
+                            filtered_wordle_solutions.append(word)
+            if invalid_chars and filtered_wordle_solutions:
+                context['filtered_wordle_solutions'] = filtered_wordle_solutions
+            elif not invalid_chars and wordle_solutions:
+                context['wordle_solutions'] = wordle_solutions
+            else:
+                context['wordle_no_solutions'] = 'There are no words with the requested letters.\n'
+
+
     return render(request, 'wordle.html', context)
 
 def scrabble(request):
@@ -158,3 +225,9 @@ def find_anagram_words(oxford, t, word_to_anagram, text):
             t.add(text1)
             text2 = word_to_anagram[0:i] + word_to_anagram[i + 1:]
             find_anagram_words(oxford, t, text2, text1)
+
+def wordle_char_locations(char_locations, form, loc):
+    if (form.cleaned_data.get(loc) != None):
+        char_locations.append(form.cleaned_data.get(loc))
+    else:
+        char_locations.append('_')

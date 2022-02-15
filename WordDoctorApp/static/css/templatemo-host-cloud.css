@@ -378,7 +378,8 @@ header {
 .banner #search-section input.searchText {
 	float: left;
 	width: 570px;
-	min-width: 280px;
+	/*min-width: 280px;*/
+	min-width: 10px;
 	height: 49px;
 	background-color: transparent;
 	border: 1px solid #fff;
