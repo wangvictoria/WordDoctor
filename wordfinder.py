@@ -1,4 +1,3 @@
-from re import I
 from python_datastructures import Trie
 import numpy as np
 import itertools as it
@@ -28,48 +27,77 @@ SCRABBLE_LETTER_SCORES = {"a": 1, "e": 1, "i": 1, "o": 1, "u": 1, "l": 1, "n": 1
 # WordBrain (superset of Boggle functionality)
 # Wordscape --> DONE
 
-def main_scrabble():
+def scrabble_main():
     user_chars = input("Enter your characters: ")
     chars_on_board = input("Enter open characters on board you think have potential: ")
-    with open("ospd.txt", "r") as file:
-        
-
+    with open("words.txt", "r") as file:
         word_list = file.readlines()
 
-        user_chars = "".join(set(user_chars))
-        chars_on_board_set = "".join(set(chars_on_board))
+    processed_list = [word.strip() for word in word_list if (len(word.strip()) >= SCRABBLE_START and len(word.strip()) <= SCRABBLE_END)]
 
-        word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, SCRABBLE_END + 1, 1)])
-        for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-            word_dict[i] = []
+    user_chars = "".join(set(user_chars.strip()))
+    chars_on_board = "".join(set(chars_on_board.strip()))
 
-        scrabble_processing(word_dict, chars_on_board_set, word_list)
-                                                                    
-        print(word_dict)
+    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, SCRABBLE_END + 1, 1)])
+    for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
+        word_dict[i] = []
 
-        print("\n\nFinding your words...\n")
-        for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-            if word_dict[i]:
-                print(f'Words of size {i} with your letters (sequentially):')
-                print(*word_dict[i], sep=', ')
-                print()
-            else:
-                print(f'There are no words of size {i} with the requested letters sequentially.\n')
+    print("\n\nFinding your words...\n")
+    scrabble_processing(word_dict, processed_list, chars_on_board, user_chars)
+
+    for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
+        if word_dict[i]:
+            print(f'Words of size {i} with your letters (sequentially):')
+            print(*word_dict[i], sep=', ')
+            print()
+        else:
+            print(f'There are no words of size {i} with the requested letters sequentially.\n')
 
 
-def scrabble_processing(word_dict, chars_on_board_set, word_list):
+def scrabble_processing(word_dict, processed_list, chars_on_board, user_chars):
 
-    for word in word_list:
-        word = word.strip()
-        for i in range(0, len(word), 1):
-            for j in range(0, chars_on_board_set, 1):
-                if a[i] == word:
-                    a = np.delete(a, i)
+    if chars_on_board:
+
+        for word in processed_list:
+
+            check_chars_on_board = False
+            chars_on_board_index = -1
+            word_index_for_chars_on_board = -1
+
+            check_user_chars = False
+            user_chars_index = -1
+            word_index_for_user_chars = -1
+
+            for i in range(0, len(word), 1):
+
+
+                    
+                # NOTE --> check if the char in word is in both chars_on_board and user_chars and also if the chars
+                # corresponding to the indices where the letters aren't referring to the same index (ex. if they both have the same
+                # character somewhere, make sure it counts twice rather than just once
+        
+
+                if not check_chars_on_board and chars_on_board.find(word[i]) > -1:
+                    check_chars_on_board = True
+                    chars_on_board_index = chars_on_board.find(word[i])
+                    word_index_for_chars_on_board = i
+                    
+
+                if not check_user_chars and user_chars.find(word[i]) > -1:
+                    check_user_chars = True
+                    user_chars_index = user_chars.find(word[i])
+                    word_index_for_user_chars = i
+                
+                if check_user_chars and check_chars_on_board:
+                    if word_index_for_user_chars == word_index_for_chars_on_board and word.find(chars_on_board[chars_on_board_index],
+                                                                                                word_index_for_chars_on_board + 1) == -1:
+                        check_chars_on_board = False
+                        chars_on_board_index = -1
+                        word_index_for_chars_on_board = -1
+                    else:
+                        print(word)
+                        word_dict[len(word)].append(word)
                         break
-            if substr[i] not in word:
-                break
-            if i == len(substr) - 1:
-                word_dict[len(word)].append(word)
 
 
 def wordle():
@@ -362,7 +390,7 @@ def boggle_and_wordhunt():
     with open("words.txt", "r") as file:
         word_list = file.readlines()
 
-    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START + 1, BOGGLE_WORD_MAX + 1, 1)])
+    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, BOGGLE_WORD_MAX + 1, 1)])
     oxford = Trie()
 
     for word in word_list:
@@ -394,4 +422,4 @@ def boggle_and_wordhunt():
 #         return 11
 
 if __name__ == "__main__":
-    wordle()
+    scrabble_main()
