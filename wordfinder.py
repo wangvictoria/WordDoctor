@@ -56,6 +56,7 @@ def scrabble_main():
 
 def scrabble_processing(word_dict, processed_list, chars_on_board, user_chars):
 
+<<<<<<< HEAD
     if chars_on_board:
 
         for word in processed_list:
@@ -98,6 +99,19 @@ def scrabble_processing(word_dict, processed_list, chars_on_board, user_chars):
                         print(word)
                         word_dict[len(word)].append(word)
                         break
+=======
+    for word in word_list:
+        word = word.strip()
+        for i in range(0, len(word), 1):
+            for j in range(0, chars_on_board_set, 1):
+                if a[i] == word:
+                    a = np.delete(a, i)
+                    break
+            if substr[i] not in word:
+                break
+            if i == len(substr) - 1:
+                word_dict[len(word)].append(word)
+>>>>>>> origin/main
 
 
 def wordle():
