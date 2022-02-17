@@ -59,10 +59,16 @@ class Trie:
 
 
     def is_word(self, word):
-        return self.start.is_word(word)
+        if word == "":
+            return False
+        else:  
+            return self.start.is_word(word)
 
     def is_prefix(self, word):
-        return self.start.is_prefix(word)
+        if word == "":
+            return True
+        else:
+            return self.start.is_prefix(word)
 
 
 
