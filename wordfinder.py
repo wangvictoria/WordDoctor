@@ -1,9 +1,11 @@
+from math import ceil
+from timeit import repeat
 from python_datastructures import Trie
 import numpy as np
 import itertools as it
 
 SCRABBLE_START = 3
-SCRABBLE_END = 15
+SCRABBLE_END = 8
 WORDLE_LEN = 5
 ALPHABET_START = 1
 ALPHABET_END = 26
@@ -30,7 +32,7 @@ SCRABBLE_LETTER_SCORES = {"a": 1, "e": 1, "i": 1, "o": 1, "u": 1, "l": 1, "n": 1
 def scrabble_main():
     user_chars = input("Enter your characters: ")
     chars_on_board = input("Enter open characters on board you think have potential: ")
-    with open("words.txt", "r") as file:
+    with open("ospd.txt", "r") as file:
         word_list = file.readlines()
 
     processed_list = [word.strip() for word in word_list if (len(word.strip()) >= SCRABBLE_START and len(word.strip()) <= SCRABBLE_END)]
@@ -53,66 +55,43 @@ def scrabble_main():
         else:
             print(f'There are no words of size {i} with the requested letters sequentially.\n')
 
-
 def scrabble_processing(word_dict, processed_list, chars_on_board, user_chars):
 
-<<<<<<< HEAD
-    if chars_on_board:
+    # removing duplicated characters
+    char_set = "".join(set(chars_on_board + user_chars))
+    char_counter = 0
+    repeat_letters = 0
 
-        for word in processed_list:
+    for word in processed_list:
+        char_bound = ceil((3*len(word))/4)
 
-            check_chars_on_board = False
-            chars_on_board_index = -1
-            word_index_for_chars_on_board = -1
+        word_with_no_repeats = "".join(set(word))
+        for char in word_with_no_repeats:
+            char_occurrences = word.count(char)
+            if char_occurrences > 1:
+                repeat_letters += (char_occurrences / 2)
 
-            check_user_chars = False
-            user_chars_index = -1
-            word_index_for_user_chars = -1
+        for i in range(0, len(word), 1):
 
-            for i in range(0, len(word), 1):
+            if char_set.find(word[i]) > -1:
+                char_counter += 1
+            
+            if char_counter >= char_bound + repeat_letters and char_counter <= len(word):
+                word_dict[len(word)].append(word)
+                char_counter = 0
+                repeat_letters = 0
+                break
 
-
-                    
-                # NOTE --> check if the char in word is in both chars_on_board and user_chars and also if the chars
-                # corresponding to the indices where the letters aren't referring to the same index (ex. if they both have the same
-                # character somewhere, make sure it counts twice rather than just once
+        char_counter = 0
+        repeat_letters = 0
         
 
-                if not check_chars_on_board and chars_on_board.find(word[i]) > -1:
-                    check_chars_on_board = True
-                    chars_on_board_index = chars_on_board.find(word[i])
-                    word_index_for_chars_on_board = i
-                    
 
-                if not check_user_chars and user_chars.find(word[i]) > -1:
-                    check_user_chars = True
-                    user_chars_index = user_chars.find(word[i])
-                    word_index_for_user_chars = i
-                
-                if check_user_chars and check_chars_on_board:
-                    if word_index_for_user_chars == word_index_for_chars_on_board and word.find(chars_on_board[chars_on_board_index],
-                                                                                                word_index_for_chars_on_board + 1) == -1:
-                        check_chars_on_board = False
-                        chars_on_board_index = -1
-                        word_index_for_chars_on_board = -1
-                    else:
-                        print(word)
-                        word_dict[len(word)].append(word)
-                        break
-=======
-    for word in word_list:
-        word = word.strip()
-        for i in range(0, len(word), 1):
-            for j in range(0, chars_on_board_set, 1):
-                if a[i] == word:
-                    a = np.delete(a, i)
-                    break
-            if substr[i] not in word:
-                break
-            if i == len(substr) - 1:
-                word_dict[len(word)].append(word)
->>>>>>> origin/main
-
+def find_scrabble_base_word_score(word):
+    score = 0
+    for char in word:
+        score += SCRABBLE_LETTER_SCORES[char]
+    return score
 
 def wordle():
 
