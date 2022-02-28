@@ -21,12 +21,13 @@
                       <form method="post" enctype='multipart/form-data'>{% csrf_token %}
                         {{ form.non_field_errors }}
                   <div class="searchText">
-                    
-                    <input type="char" name="wordle_loc1" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
-                    <input type="char" name="wordle_loc2" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
-                    <input type="char" name="wordle_loc3" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
-                    <input type="char" name="wordle_loc4" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
-                    <input type="char" name="wordle_loc5" class="searchText" placeholder="" autocomplete="off" style="width:20px;">
+                    <div class="" style="text-align:center;">
+                    <input type="char" name="wordle_loc1" class="searchText" placeholder="" autocomplete="off" style="width:50px;">
+                    <input type="char" name="wordle_loc2" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;">
+                    <input type="char" name="wordle_loc3" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;">
+                    <input type="char" name="wordle_loc4" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;">
+                    <input type="char" name="wordle_loc5" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;">
+                    </div>
                     <input type="text" name="wordle_known_letters" class="searchText" placeholder="Enter known letters here..." autocomplete="off">
                     <input type="text" name="wordle_invalid_letters" class="searchText" placeholder="Enter incorrect letters here..." autocomplete="off">
                     <!--<ul>
