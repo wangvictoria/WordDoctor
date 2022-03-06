@@ -188,51 +188,49 @@ def anagrams():
     # going through scrabble dictionary to use this as the basis for finding anagrams
     with open("ospd.txt", "r") as file:
         word_list = file.readlines()
-
-    # converting word_arr for ease of manipulation
-    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, len(word_to_anagram) + 1, 1)])
-
-    for key in word_dict.keys():
-        word_dict[key] = []
     
-    # stripping white space and adding words to Trie, and dictionary;
-    # dictionary used to reduce the search space of any anagram look up 
-    # for a certain permutation of chars in our choice word
-    for word in word_list:
-        word = word.strip()
-        if len(word) <= len(word_to_anagram):
-            word_dict[len(word)].append(word)
+    t = My_Trie()
+
+    processed_words = [word.strip() for word in word_list if len(word.strip()) >= SCRABBLE_START and len(word.strip()) <= len(word_to_anagram)]
+
+    for word in processed_words:
+        t.insert(word)
+            
     
     # finding what amounts to the powerset of the word's chars to
     # find out whether each combination of words counts as an actual
     # word in the OSPD
-    word_to_anagram_combinations = []
-    for i in range(SCRABBLE_START, len(word), 1):
-        for combo in it.combinations(word_to_anagram.strip().lower(), i):
-            word_to_anagram_combinations.append("".join(combo))
-    
-    word_to_anagram_permutations = []
+    word_to_anagram_permutations= []
+    for i in range(SCRABBLE_START, len(word_to_anagram) + 1, 1):
+        for perm in it.permutations(word_to_anagram.strip().lower(), i):
+            word_to_anagram_permutations.append("".join(perm))
 
-    for word in word_to_anagram_combinations:
-        word_to_anagram_permutations += list(it.permutations(word))
+    print(word_to_anagram_permutations)
     
-    word_to_anagram_permutations_strings = []
+    word_to_anagram_combinations = []
 
     for word in word_to_anagram_permutations:
-        word_to_anagram_permutations_strings.append("".join(word))
+        for i in range(SCRABBLE_START, len(word_to_anagram) + 1, 1):
+            word_to_anagram_combinations += list(it.combinations(word, i))
+    
+    word_to_anagram_strings = []
+
+    for word in word_to_anagram_combinations:
+        word_to_anagram_strings.append("".join(word))
 
     # eliminating duplicates
-    word_to_anagram_permutations_strings = list(set(word_to_anagram_permutations_strings))
+    word_to_anagram_strings = list(set(word_to_anagram_strings))
     
+    print(word_to_anagram_strings)
     anagrams = []
 
     # checking to see if all anagrams combos are a valid word in the OSPD,
     # and therefore if it is a valid anagram
-    for word in word_to_anagram_permutations_strings:
-        if word in word_dict[len(word)]:
+    for word in word_to_anagram_strings:
+        if t.is_word(word):
             anagrams.append(word)
 
-    anagrams = sorted(list(set(anagrams)), key=len)
+    anagrams.sort(reverse=True, key=len)
 
     print(f"Here are your anagrams for {word_to_anagram}\n{anagrams}")
 
@@ -259,7 +257,7 @@ def anagrams_trie():
 
     print("Processing dictionary...\n\n")
     # going through scrabble dictionary to use this as the basis for finding anagrams
-    with open("words.txt", "r") as file:
+    with open("ospd.txt", "r") as file:
         word_list = file.readlines()
 
     # stripping white space and adding words to Trie, and dictionary;
@@ -419,4 +417,4 @@ def boggle_and_wordhunt():
 #         return 11
 
 if __name__ == "__main__":
-    wordscapes()
+    anagrams_trie()
