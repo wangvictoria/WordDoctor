@@ -1,6 +1,6 @@
 from math import ceil
+from trie_test import My_Trie
 from timeit import repeat
-from python_datastructures import Trie
 import numpy as np
 import itertools as it
 
@@ -40,20 +40,20 @@ def scrabble_main():
     user_chars = "".join(set(user_chars.strip()))
     chars_on_board = "".join(set(chars_on_board.strip()))
 
-    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, SCRABBLE_END + 1, 1)])
-    for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-        word_dict[i] = []
+    word_dict = {}
 
     print("\n\nFinding your words...\n")
     scrabble_processing(word_dict, processed_list, chars_on_board, user_chars)
 
-    for i in range(SCRABBLE_START, SCRABBLE_END + 1, 1):
-        if word_dict[i]:
-            print(f'Words of size {i} with your letters (sequentially):')
-            print(*word_dict[i], sep=', ')
-            print()
-        else:
-            print(f'There are no words of size {i} with the requested letters sequentially.\n')
+    keys_list = [key for key in word_dict.keys()]
+    keys_list.sort(reverse=True)
+
+    print("Printing your words...")
+    for key in keys_list:
+        print(f'Scrabble solutions of size {key}:\n')
+        print(*word_dict[key], sep=', ')
+        print('\n')
+
 
 def scrabble_processing(word_dict, processed_list, chars_on_board, user_chars):
 
@@ -77,7 +77,10 @@ def scrabble_processing(word_dict, processed_list, chars_on_board, user_chars):
                 char_counter += 1
             
             if char_counter >= char_bound + repeat_letters and char_counter <= len(word):
-                word_dict[len(word)].append(word)
+                score = find_scrabble_base_word_score(word)
+                if score not in word_dict.keys():
+                    word_dict[score] = []
+                word_dict[score].append(word)
                 char_counter = 0
                 repeat_letters = 0
                 break
@@ -243,10 +246,10 @@ def anagrams_trie():
     word_list = None
 
     # oxford will have the entire applicable dictionary of related words within it
-    oxford = Trie()
+    oxford = My_Trie()
 
     # t will be the Trie to which we add words which are anagrams
-    t = Trie()
+    t = My_Trie()
 
     word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, len(word_to_anagram) + 1, 1)])
     anagrams_solutions = dict.fromkeys([num for num in range(SCRABBLE_START, len(word_to_anagram) + 1, 1)])
@@ -272,7 +275,7 @@ def anagrams_trie():
         # the word we're trying to anagram
         if len(word) <= len(word_to_anagram) and len(word) >= SCRABBLE_START:
             word_dict[len(word)].append(word)
-            oxford.add(word)
+            oxford.insert(word)
     
     print("\n\nFinding your words...\n\n")
     # helper function allowing us to find permutations;
@@ -281,7 +284,7 @@ def anagrams_trie():
 
     for key in word_dict.keys():
         for word in word_dict[key]:
-            if t.contains(word):
+            if t.is_word(word):
                 anagrams_solutions[len(word)].append(word)
 
     for i in range(SCRABBLE_START, len(word_to_anagram) + 1, 1):
@@ -297,8 +300,9 @@ def find_anagram_words(oxford, t, word_to_anagram, text):
 
     for i in range(0, len(word_to_anagram), 1):
         text1 = text + word_to_anagram[i]
-        if oxford.contains(text1) and not t.contains(text1):
-            t.add(text1)
+        if oxford.is_prefix(text1) and not t.is_prefix(text1):
+            if oxford.is_word(text1):
+                t.insert(text1)
             text2 = word_to_anagram[0:i] + word_to_anagram[i + 1:]
             find_anagram_words(oxford, t, text2, text1)
 
@@ -327,10 +331,10 @@ def wordscapes():
         word_size = int(input("What size word are you looking for? Enter a number: ").strip())
 
     # oxford will have the entire applicable dictionary of related words within it
-    oxford = Trie()
+    oxford = My_Trie()
 
     # t will be the Trie to which we add words which are anagrams
-    t = Trie()
+    t = My_Trie()
 
     # word_search_space will be all applicable words of a certain size 
     word_search_space = []
@@ -347,7 +351,7 @@ def wordscapes():
         if (length_check and len(word) == word_size) or not length_check:
             if len(word) >= SCRABBLE_START:
                 word_search_space.append(word)
-                oxford.add(word)
+                oxford.insert(word)
                 
     print("\n\nFinding your words...\n")
     find_anagram_words(oxford, t, sorted(wordscape_chars), "")
@@ -358,7 +362,7 @@ def wordscapes():
         wordscapes_solutions[key] = []
 
     for word in word_search_space:
-        if t.contains(word):
+        if t.is_word(word):
             if (length_check and len(word) == word_size) or not length_check:
                 wordscapes_solutions[len(word)].append(word)
 
@@ -384,7 +388,7 @@ def boggle_and_wordhunt():
         word_list = file.readlines()
 
     word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, BOGGLE_WORD_MAX + 1, 1)])
-    oxford = Trie()
+    oxford = My_Trie()
 
     for word in word_list:
         word = word.strip()
@@ -393,7 +397,7 @@ def boggle_and_wordhunt():
         # the max length of a Boggle word (16 chars)
         if len(word) <= BOGGLE_WORD_MAX and len(word) > SCRABBLE_START:
             word_dict[len(word)].append(word)
-            oxford.add(word)
+            oxford.insert(word)
 
     boggle_list = []
 
@@ -415,4 +419,4 @@ def boggle_and_wordhunt():
 #         return 11
 
 if __name__ == "__main__":
-    scrabble_main()
+    wordscapes()

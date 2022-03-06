@@ -34,7 +34,7 @@ class Node:
                 return False
 
     
-class Trie:
+class My_Trie:
     __slots__ = ('start', 'size')
 
 
@@ -72,7 +72,7 @@ class Trie:
 
 
 
-trie = Trie()
+trie = My_Trie()
 # trie.insert("test")
 # trie.insert("different")
 # trie.insert("lengths")
@@ -86,13 +86,10 @@ trie = Trie()
 #     word = input("Prefix: ")
 #     print(trie.is_prefix(word))
 
-with open("wordle.txt", "r") as file:
+with open("ospd.txt", "r") as file:
     word_list = file.readlines()
 
     for word in word_list:
         word = word.strip()
         trie.insert(word)
 
-while (True):
-    word = input("Enter word: ")
-    print(trie.is_word(word))
