@@ -4,13 +4,15 @@ from timeit import repeat
 import numpy as np
 import itertools as it
 
+BOGGLE_WORD_MAX = 16
+BOGGLE_WORD_MIN = 2
 SCRABBLE_START = 3
 SCRABBLE_END = 8
 WORDLE_LEN = 5
 ALPHABET_START = 1
 ALPHABET_END = 26
 BOGGLE_SIDE_LEN = 4
-BOGGLE_WORD_MAX = 4
+#BOGGLE_WORD_MAX = 4
 SCRABBLE_LETTER_SCORES = {"a": 1, "e": 1, "i": 1, "o": 1, "u": 1, "l": 1, "n": 1,
                         "s": 1, "t": 1, "r": 1, "d": 2, "g": 2, "b": 3, "c": 3,
                         "m": 3, "p": 3, "f": 4, "h": 4, "v": 4, "w": 4, "y": 4,
@@ -412,34 +414,124 @@ def wordscapes():
             print(f'There are no words with {i} characters and the requested letters\n')
 
 
-
-def boggle_and_wordhunt():
-    boggle_board = []
-    for i in range(0, BOGGLE_SIDE_LEN, 1):
-        end_term = "st" if i == 0 else ("nd" if (i == 1) else ("rd" if (i == 2) else "th"))
-        boggle_board.append(input(f"Enter your {i + 1}{end_term} row: ").strip().lower().split())
-
-    word_list = []
-
+def create_trie():
+    # creates list where each word in dictionary is an item in the list
     with open("words.txt", "r") as file:
         word_list = file.readlines()
 
-    word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, BOGGLE_WORD_MAX + 1, 1)])
+    # initializes Trie
     oxford = My_Trie()
 
-    for word in word_list:
-        word = word.strip()
-
+    # removes all leading and trailing whitespace for each word in list
+    for new_word in word_list:
+        new_word = new_word.strip()
         # only allowing words that are longer than 2 chars and shorter than
         # the max length of a Boggle word (16 chars)
-        if len(word) <= BOGGLE_WORD_MAX and len(word) > SCRABBLE_START:
-            word_dict[len(word)].append(word)
-            oxford.insert(word)
+        if BOGGLE_WORD_MAX >= len(new_word) > BOGGLE_WORD_MIN:
+            # inserts words into Trie form word_list
+            oxford.insert(new_word)
+    return oxford
 
-    boggle_list = []
+    # for word in boggle_list:
+    #  print(f"{word} --> score: {find_boggle_score(word)}")
 
-    for word in boggle_list.sort(key=len):
-        print(f"{word}")
+
+def find_boggle_score(solved_word):
+    if len(solved_word) < 3:
+        return 0
+    elif len(solved_word) < 5:
+        return 1
+    elif len(solved_word) < 6:
+        return 2
+    elif len(solved_word) < 7:
+        return 3
+    elif len(solved_word) < 8:
+        return 4
+    else:
+        return 11
+
+
+def solverRecursive(board, visited, dictionary, x, y, my_string):
+    # mark visited
+    visited[x][y] = True
+    # update string with letter on board
+    tempstr = board[x][y].decode("utf-8")
+    my_string += tempstr
+    #  print if word
+    if dictionary.is_word(my_string):
+        print(my_string)
+
+    # traverse adjacent cells to current cell
+    # move index to row above i
+    if dictionary.is_prefix(my_string):
+        rowIndex = x - 1
+        while rowIndex <= x + 1 and rowIndex < BOGGLE_SIDE_LEN:
+            colIndex = y - 1
+            while colIndex <= y + 1 and colIndex < BOGGLE_SIDE_LEN:
+                if rowIndex >= 0 and colIndex >= 0 and not visited[rowIndex][colIndex]:
+                    solverRecursive(board, visited, dictionary, rowIndex, colIndex, my_string)
+                colIndex += 1
+            rowIndex += 1
+
+    my_string = "" + my_string[-1]
+    visited[x][y] = False
+
+
+def solver(board, dictionary):
+    # creates array of visited cells initialized to false
+    visited = np.full((4, 4), False)
+    #   print(visited)
+
+    temp_string = ""
+
+    # nested for loop traversing through all letters on boggle board
+    for a in range(BOGGLE_SIDE_LEN):
+        for b in range(BOGGLE_SIDE_LEN):
+            solverRecursive(board, visited, dictionary, a, b, temp_string)
+            visited[:] = False
+
+def boggle_start():
+    # initializes boggle board with user input
+    boggle_board = np.chararray((4, 4))
+
+    for i in range(0, BOGGLE_SIDE_LEN, 1):
+        for j in range(0, BOGGLE_SIDE_LEN, 1):
+            boggle_board[i][j] = input("Enter letter: ")
+
+    print(boggle_board)
+    my_trie = create_trie()
+    solver(boggle_board, my_trie)
+
+
+
+
+# def boggle_and_wordhunt():
+#     boggle_board = []
+#     for i in range(0, BOGGLE_SIDE_LEN, 1):
+#         end_term = "st" if i == 0 else ("nd" if (i == 1) else ("rd" if (i == 2) else "th"))
+#         boggle_board.append(input(f"Enter your {i + 1}{end_term} row: ").strip().lower().split())
+#
+#     word_list = []
+#
+#     with open("words.txt", "r") as file:
+#         word_list = file.readlines()
+#
+#     word_dict = dict.fromkeys([num for num in range(SCRABBLE_START, BOGGLE_WORD_MAX + 1, 1)])
+#     oxford = My_Trie()
+#
+#     for word in word_list:
+#         word = word.strip()
+#
+#         # only allowing words that are longer than 2 chars and shorter than
+#         # the max length of a Boggle word (16 chars)
+#         if len(word) <= BOGGLE_WORD_MAX and len(word) > SCRABBLE_START:
+#             word_dict[len(word)].append(word)
+#             oxford.insert(word)
+#
+#     boggle_list = []
+#
+#     for word in boggle_list.sort(key=len):
+#         print(f"{word}")
 
 # def find_boggle_score(word):
 #     if len(word) < 3:
