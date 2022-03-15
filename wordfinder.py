@@ -494,9 +494,14 @@ def boggle_start():
     # initializes boggle board with user input
     boggle_board = np.chararray((4, 4))
 
+    counter = 1
     for i in range(0, BOGGLE_SIDE_LEN, 1):
         for j in range(0, BOGGLE_SIDE_LEN, 1):
-            boggle_board[i][j] = input("Enter letter: ")
+            temp_input = input("Enter letter " + str(counter) + " : ")
+            while len(temp_input) != 1 or not temp_input.isalpha():
+                temp_input = input("Invalid input. Insert new letter " + str(counter) + " : ")
+            boggle_board[i][j] = temp_input
+            counter = counter + 1
 
     print(boggle_board)
     my_trie = create_trie()
