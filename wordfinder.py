@@ -22,15 +22,6 @@ SCRABBLE_LETTER_SCORES = {"a": 1, "e": 1, "i": 1, "o": 1, "u": 1, "l": 1, "n": 1
 # Python with multi-threading and with the standard approach I outline below using one of
 # the timer modules; check out this article https://realpython.com/python-timer/
 
-
-# Need solution for following games:
-# Scrabble --> approaching completion
-# Wordle --> DONE
-# Anagrams --> DONE
-# Boggle / WordHunt
-# WordBrain (superset of Boggle functionality)
-# Wordscape --> DONE
-
 def scrabble_main():
     user_chars = input("Enter your characters: ")
     chars_on_board = input("Enter open characters on board you think have potential: ")
@@ -39,13 +30,13 @@ def scrabble_main():
 
     processed_list = [word.strip() for word in word_list if (len(word.strip()) >= SCRABBLE_START and len(word.strip()) <= SCRABBLE_END)]
 
-    user_chars = "".join(set(user_chars.strip()))
-    chars_on_board = "".join(set(chars_on_board.strip()))
+    user_chars = list(user_chars.strip())
+    chars_on_board = list(chars_on_board.strip())
 
     word_dict = {}
 
     print("\n\nFinding your words...\n")
-    scrabble_processing_updated(word_dict, processed_list, chars_on_board, user_chars)
+    scrabble_processing(word_dict, processed_list, chars_on_board, user_chars)
 
     keys_list = [key for key in word_dict.keys()]
     keys_list.sort(reverse=True)
@@ -57,77 +48,65 @@ def scrabble_main():
         print('\n')
 
         
-def scrabble_processing_updated(word_dict, processed_list, chars_on_board, user_chars):
-
-    # it appears that this solution works so I'm leaving comments to endeavor to explain how
-    # it actually finds scrabble words; this is an arbitrary cutoff 
-
-    # removing duplicated characters
-
-    char_counter = 0
-    repeat_letters = 0
-
-    # removing duplicated characters
-    char_set = "".join(set(user_chars))
-    char_counter = 0
-    repeat_letters = 0
+def scrabble_processing(word_dict, processed_list, chars_on_board, user_chars):
 
     for word in processed_list:
+        user_chars_copy = user_chars.copy()
+        chars_on_board_copy = chars_on_board.copy()
+
+        used_chars = []
+
+        for char in word:
+            if char in user_chars_copy:
+                user_chars_copy.remove(char)
+                used_chars.append(char)
         
-        # this is an arbitray cutoff for the number of characters a word must have from both
-        # the characters the user has in their hand and the characters on the board that the user
-        # wants to find a word to make. I set it at around 2/3 of the characters matching
-        # which I think is fair enough. I account for repeats later.
-        char_bound = ceil(2*len(word)/3)
+        # checking to see if every letter of the word except for one on the board
+        # comes from the user's current hand
+
+        if len(used_chars) == (len(word) - 1):
+            for char in word:
+
+                # checking for final character that we need to complete the word
+                # here it's assumed that the character should be on the board and
+                # isn't in used_chars
+                if char in chars_on_board_copy and char not in used_chars:
+                    chars_on_board_copy.remove(char)
+                    used_chars.append(char)
+
+        # accounting for case where all the letters are in the hand to make a word
+        # just in case there is a letter on the board that matches what was in your hand
+        elif len(used_chars) == len(word):
+            for char in used_chars:
+                if char in chars_on_board_copy:
+                    # calculating the scrabble word score - this is self-explanatory, method's further below
+                    score = find_scrabble_base_word_score(word)
+
+                    # if there are no words for a particular score, initialize this key-value pair so we
+                    # can add words of a certain score later.
+                    if score not in word_dict.keys():
+                        word_dict[score] = []
+                                
+                    # adding a word to the list which makes up the value to the key of a specific score
+                    word_dict[score].append(word)
+                    break
+            continue
+        else:
+            continue
+
         
-        # python idiom to remove repeating characters from a word
-        word_with_no_repeats = "".join(set(word))
+        if sorted(word) == sorted("".join(used_chars)):
 
-        # here I calculate the number of repeating characters, basically just adding up the occurrences
-        # of a character for each character in the word. I calculate the count for each word and fine
-        # the repeat_letters of that word by taking the number of occurrences, I just increment repeat_letters
-        # by one.
-        for char in word_with_no_repeats:
-            if word.count(char) > 1:
-                repeat_letters += 1
+            # calculating the scrabble word score - this is self-explanatory, method's further below
+            score = find_scrabble_base_word_score(word)
 
-
-        for i in range(0, len(word), 1):
-
-                # if a character is found in the word that is in the combined set of characters
-                # on the board that the user thinks is high potential or in the set of characters
-                # in the user's hand, increment char_counter
-            if char_set.find(word[i]) > -1:
-                char_counter += 1
-            
-            if char_counter >= char_bound + repeat_letters and char_counter <= len(word):
-                
-                for char in word:
-                    if ((chars_on_board.find(char) > -1 and word.count(char) > 1)
-                        or (chars_on_board.find(char) > -1 and user_chars.find(char) == -1)):
-
-                        # calculating the scrabble word score - this is self-explanatory, method's further below
-                        score = find_scrabble_base_word_score(word)
-
-                        # if there are no words for a particular score, initialize this key-value pair so we
-                        # can add words of a certain score later.
-                        if score not in word_dict.keys():
-                            word_dict[score] = []
+            # if there are no words for a particular score, initialize this key-value pair so we
+            # can add words of a certain score later.
+            if score not in word_dict.keys():
+                word_dict[score] = []
                         
-                        # adding a word to the list which makes up the value to the key of a specific score
-                        word_dict[score].append(word)
-
-                        # resetting the counting variables for the next word and breaking from the loop 
-                        # of analyzing each character when we have seen enough
-                        char_counter = 0
-                        repeat_letters = 0
-                        break
-        
-        # resetting the counting variables for the next word just in case a word doesn't fit
-        # with the letters the user has on the board / in their hand
-        char_counter = 0
-        repeat_letters = 0
-
+            # adding a word to the list which makes up the value to the key of a specific score
+            word_dict[score].append(word)
 
 
 
@@ -136,6 +115,8 @@ def find_scrabble_base_word_score(word):
     for char in word:
         score += SCRABBLE_LETTER_SCORES[char]
     return score
+
+
 
 def wordle():
 
