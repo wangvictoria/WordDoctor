@@ -1,26 +1,26 @@
 from django.shortcuts import render
-from .forms import AnagramsForm, WordscapeForm, WordleForm
+from django.contrib import messages
+from .forms import AnagramsForm, WordscapeForm, WordleForm, BoggleForm
 
-from gettext import npgettext
-import multiprocessing as mp
-from multiprocessing.dummy import Process, Manager
-from re import I
-from python_datastructures import Trie
+from math import ceil
+from trie_test import My_Trie
+from timeit import repeat
 import numpy as np
 import itertools as it
 
-SCRABBLE_START = 2
-SCRABBLE_END = 15
+BOGGLE_WORD_MAX = 16
+BOGGLE_WORD_MIN = 2
+SCRABBLE_START = 3
+SCRABBLE_END = 8
 WORDLE_LEN = 5
 ALPHABET_START = 1
 ALPHABET_END = 26
 BOGGLE_SIDE_LEN = 4
-BOGGLE_WORD_MAX = 4
-#PATH = "/Users/shaneausmus/Desktop/Vandy Course Materials/Spring 2022/CS 4279/WordDoctor"
-SCRABBLE_LETTER_SCORES = {"A": 1, "E": 1, "I": 1, "O": 1, "U": 1, "L": 1, "N": 1,
-                        "S": 1, "T": 1, "R": 1, "D": 2, "G": 2, "B": 3, "C": 3,
-                        "M": 3, "P": 3, "F": 4, "H": 4, "V": 4, "W": 4, "Y": 4,
-                        "K": 5, "J": 8, "X": 8, "Q": 10, "Z": 10} 
+#BOGGLE_WORD_MAX = 4
+SCRABBLE_LETTER_SCORES = {"a": 1, "e": 1, "i": 1, "o": 1, "u": 1, "l": 1, "n": 1,
+                        "s": 1, "t": 1, "r": 1, "d": 2, "g": 2, "b": 3, "c": 3,
+                        "m": 3, "p": 3, "f": 4, "h": 4, "v": 4, "w": 4, "y": 4,
+                        "k": 5, "j": 8, "x": 8, "q": 10, "z": 10} 
 
 # Create your views here.
 
@@ -38,6 +38,8 @@ def wordle(request):
         if form.is_valid():
             form.save()
 
+            # TODO: check to see if form is empty
+
             # populate char locations
             char_locations = []
             wordle_char_locations(char_locations, form, 'wordle_loc1')
@@ -46,6 +48,7 @@ def wordle(request):
             wordle_char_locations(char_locations, form, 'wordle_loc4')
             wordle_char_locations(char_locations, form, 'wordle_loc5')
 
+
             # TODO: fix error checking for user input known characters
             # num_known_characters = 0
             # for i in range(0, WORDLE_LEN, 1):
@@ -53,12 +56,17 @@ def wordle(request):
             #         num_known_characters = num_known_characters + 1
 
             char_list = form.cleaned_data.get('wordle_known_letters')
+            if char_list == None:
+                char_list = ""
 
             check_for_invalid_letters = ""
             if (form.cleaned_data.get('wordle_invalid_letters') != None):
                 invalid_chars = list(set(form.cleaned_data.get('wordle_invalid_letters').strip().lower()))
             else:
                 invalid_chars = ""
+
+            if not(char_locations) and invalid_chars == "" and char_list == "":
+                messages.error(request, 'Please input a value.')
             
             with open("wordle.txt", "r") as file:
                 word_list = file.readlines()
@@ -116,49 +124,53 @@ def anagrams(request):
             
             word_list = None
 
-            # oxford will have the entire applicable dictionary of related words within it
-            oxford = Trie()
-
-            # t will be the Trie to which we add words which are anagrams
-            t = Trie()
-
-            word_dict = dict.fromkeys([num for num in range(SCRABBLE_START + 1, len(word_to_anagram) + 1, 1)])
-
-            for key in word_dict.keys():
-                word_dict[key] = []
-
             # going through scrabble dictionary to use this as the basis for finding anagrams
-            with open("words.txt") as file:
+            with open("ospd.txt", "r") as file:
                 word_list = file.readlines()
-
-            # stripping white space and adding words to Trie, and dictionary;
-            # dictionary used to reduce the search space of any anagram look up 
-            # for a certain permutation of chars in our choice word;
-            # there is a build function based on a list of words but I wanted to
-            # strip each word and allow for words that are too large to be
-            # omitted from the Trie
-            for word in word_list:
-                word = word.strip()
-
-                # only allowing words that are longer than 2 chars and shorter than
-                # the word we're trying to anagram
-                if len(word) <= len(word_to_anagram) and len(word) > SCRABBLE_START:
-                    word_dict[len(word)].append(word)
-                    oxford.add(word)
             
-            # helper function allowing us to find permutations;
-            # python is all pass-by-reference so this works fine
-            find_anagram_words(oxford, t, sorted(word_to_anagram), "")
+            t = My_Trie()
 
+            processed_words = [word.strip() for word in word_list if len(word.strip()) >= SCRABBLE_START and len(word.strip()) <= len(word_to_anagram)]
+
+            for word in processed_words:
+                t.insert(word)
+                    
+            
+            # finding what amounts to the powerset of the word's chars to
+            # find out whether each combination of words counts as an actual
+            # word in the OSPD
+            word_to_anagram_permutations= []
+            for i in range(SCRABBLE_START, len(word_to_anagram) + 1, 1):
+                for perm in it.permutations(word_to_anagram.strip().lower(), i):
+                    word_to_anagram_permutations.append("".join(perm))
+            
+            word_to_anagram_combinations = []
+
+            for word in word_to_anagram_permutations:
+                for i in range(SCRABBLE_START, len(word_to_anagram) + 1, 1):
+                    word_to_anagram_combinations += list(it.combinations(word, i))
+            
+            word_to_anagram_strings = []
+
+            for word in word_to_anagram_combinations:
+                word_to_anagram_strings.append("".join(word))
+
+            # eliminating duplicates
+            word_to_anagram_strings = list(set(word_to_anagram_strings))
+            
             anagrams = []
 
-            for key in word_dict.keys():
-                for word in word_dict[key]:
-                    if t.contains(word):
-                        anagrams.append(word)
+            # checking to see if all anagrams combos are a valid word in the OSPD,
+            # and therefore if it is a valid anagram
+            for word in word_to_anagram_strings:
+                if t.is_word(word):
+                    anagrams.append(word)
+
+            anagrams.sort(reverse=True, key=len)
 
             context['anagrams_results'] = anagrams
             context['anagrams_letters'] = word_to_anagram
+            context['anagrams_no_solutions'] = 'There are no words with the requested letters.\n'
 
         else:
             form = AnagramsForm(request.POST or None)
@@ -167,6 +179,44 @@ def anagrams(request):
 
 def boggle(request):
     context = {}
+
+    form = BoggleForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+
+            print("<<<<<<<<<<<<<<<<<<")
+            print(form.cleaned_data.get('boggle_11'))
+            # initializes boggle board with user input
+            boggle_board = np.chararray((4, 4))
+
+            boggle_board[0,0] = form.cleaned_data.get('boggle_11')
+            boggle_board[0,1] = form.cleaned_data.get('boggle_12')
+            boggle_board[0,2] = form.cleaned_data.get('boggle_13')
+            boggle_board[0,3] = form.cleaned_data.get('boggle_14')
+
+            boggle_board[1,0] = form.cleaned_data.get('boggle_21')
+            boggle_board[1,1] = form.cleaned_data.get('boggle_22')
+            boggle_board[1,2] = form.cleaned_data.get('boggle_23')
+            boggle_board[1,3] = form.cleaned_data.get('boggle_24')
+
+            boggle_board[2,0] = form.cleaned_data.get('boggle_31')
+            boggle_board[2,1] = form.cleaned_data.get('boggle_32')
+            boggle_board[2,2] = form.cleaned_data.get('boggle_33')
+            boggle_board[2,3] = form.cleaned_data.get('boggle_34')
+
+            boggle_board[3,0] = form.cleaned_data.get('boggle_41')
+            boggle_board[3,1] = form.cleaned_data.get('boggle_42')
+            boggle_board[3,2] = form.cleaned_data.get('boggle_43')
+            boggle_board[3,3] = form.cleaned_data.get('boggle_44')
+
+            print(boggle_board)
+            my_trie = create_trie()
+            context['boggle_solution'] = solver(boggle_board, my_trie)
+            context['boggle_no_solutions'] = 'There are no words with the requested letters.\n'
+
+        else:
+            form = BoggleForm(request.POST or None)
     return render(request, 'boggle.html', context)
 
 def wordscape(request):
@@ -176,18 +226,21 @@ def wordscape(request):
         if form.is_valid():
             form.save()
             wordscape_chars = form.cleaned_data.get('wordscape_letters').strip().lower()
+            length_check = False
             word_size = form.cleaned_data.get('wordscape_length')
+            if word_size != None:
+                length_check = True
 
             # oxford will have the entire applicable dictionary of related words within it
-            oxford = Trie()
+            oxford = My_Trie()
 
             # t will be the Trie to which we add words which are anagrams
-            t = Trie()
+            t = My_Trie()
 
             # word_search_space will be all applicable words of a certain size 
             word_search_space = []
 
-            with open("words.txt") as file:
+            with open("words.txt", "r") as file:
                 word_list = file.readlines()
 
             for word in word_list:
@@ -195,20 +248,40 @@ def wordscape(request):
 
                 # only allowing words that are longer than 2 chars and shorter than
                 # the word we're trying to anagram
-                if len(word) == word_size:                  # FIXME: DOESN'T WORK WITHOUT OPTIONAL WORD LENGTH
-                    word_search_space.append(word)
-                    oxford.add(word)
-            
+                if (length_check and len(word) == word_size) or not length_check:
+                    if len(word) >= SCRABBLE_START:
+                        word_search_space.append(word)
+                        oxford.insert(word)
+                        
             find_anagram_words(oxford, t, sorted(wordscape_chars), "")
 
-            wordscapes_solutions = []
+            wordscapes_solutions = dict.fromkeys([num for num in range(SCRABBLE_START, len(wordscape_chars) + 1, 1)])
+
+            for key in wordscapes_solutions.keys():
+                wordscapes_solutions[key] = []
 
             for word in word_search_space:
-                if t.contains(word):
-                    wordscapes_solutions.append(word)
+                if t.is_word(word):
+                    if (length_check and len(word) == word_size) or not length_check:
+                        wordscapes_solutions[len(word)].append(word)
+
+            wordscapes_list = []
+            context_list = []
+
+            if word_size == None:
+                for i in range(SCRABBLE_START, len(wordscape_chars) + 1, 1):
+                    length_list = wordscapes_solutions.get(i)
+                    for j in length_list:
+                        context_list.append(j)
+                context["wordscape_results"] = context_list
+                # for i in range(SCRABBLE_START, len(wordscape_chars) + 1, 1):
+                #     wordscapes_list.append(wordscapes_solutions[i])
+                #     context['wordscapes_results'] = wordscapes_list
+            else:
+                context['wordscape_results'] = wordscapes_solutions[word_size]
             
-            context['wordscape_results'] = wordscapes_solutions
             context['wordscape_letters'] = wordscape_chars
+            context['wordscape_no_solutions'] = 'There are no words with the requested letters.\n'
     
     return render(request, 'wordscape.html', context)
 
@@ -221,8 +294,9 @@ def general(request):
 def find_anagram_words(oxford, t, word_to_anagram, text):
     for i in range(0, len(word_to_anagram), 1):
         text1 = text + word_to_anagram[i]
-        if oxford.contains(text1) and not t.contains(text1):
-            t.add(text1)
+        if oxford.is_prefix(text1) and not t.is_prefix(text1):
+            if oxford.is_word(text1):
+                t.insert(text1)
             text2 = word_to_anagram[0:i] + word_to_anagram[i + 1:]
             find_anagram_words(oxford, t, text2, text1)
 
@@ -231,3 +305,75 @@ def wordle_char_locations(char_locations, form, loc):
         char_locations.append(form.cleaned_data.get(loc))
     else:
         char_locations.append('_')
+
+def find_boggle_score(solved_word):
+    if len(solved_word) < 3:
+        return 0
+    elif len(solved_word) < 5:
+        return 1
+    elif len(solved_word) < 6:
+        return 2
+    elif len(solved_word) < 7:
+        return 3
+    elif len(solved_word) < 8:
+        return 4
+    else:
+        return 11
+
+def solverRecursive(board, visited, dictionary, x, y, my_string, boggle_solution):
+    # mark visited
+    visited[x][y] = True
+    # update string with letter on board
+    tempstr = board[x][y].decode("utf-8")
+    my_string += tempstr
+    #  print if word
+    if dictionary.is_word(my_string):
+        boggle_solution.append(my_string)
+
+    # traverse adjacent cells to current cell
+    # move index to row above i
+    if dictionary.is_prefix(my_string):
+        rowIndex = x - 1
+        while rowIndex <= x + 1 and rowIndex < BOGGLE_SIDE_LEN:
+            colIndex = y - 1
+            while colIndex <= y + 1 and colIndex < BOGGLE_SIDE_LEN:
+                if rowIndex >= 0 and colIndex >= 0 and not visited[rowIndex][colIndex]:
+                    solverRecursive(board, visited, dictionary, rowIndex, colIndex, my_string, boggle_solution)
+                colIndex += 1
+            rowIndex += 1
+
+    my_string = "" + my_string[-1]
+    visited[x][y] = False
+
+def solver(board, dictionary):
+    # creates array of visited cells initialized to false
+    visited = np.full((4, 4), False)
+    boggle_solution = []
+    #   print(visited)
+
+    temp_string = ""
+
+    # nested for loop traversing through all letters on boggle board
+    for a in range(BOGGLE_SIDE_LEN):
+        for b in range(BOGGLE_SIDE_LEN):
+            solverRecursive(board, visited, dictionary, a, b, temp_string, boggle_solution)
+            visited[:] = False
+    return boggle_solution
+
+def create_trie():
+    # creates list where each word in dictionary is an item in the list
+    with open("words.txt", "r") as file:
+        word_list = file.readlines()
+
+    # initializes Trie
+    oxford = My_Trie()
+
+    # removes all leading and trailing whitespace for each word in list
+    for new_word in word_list:
+        new_word = new_word.strip()
+        # only allowing words that are longer than 2 chars and shorter than
+        # the max length of a Boggle word (16 chars)
+        if BOGGLE_WORD_MAX >= len(new_word) > BOGGLE_WORD_MIN:
+            # inserts words into Trie form word_list
+            oxford.insert(new_word)
+    return oxford

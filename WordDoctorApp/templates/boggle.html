@@ -17,10 +17,34 @@
               <div class="header-text caption">
                 <h2>Boggle</h2>
                 <div id="search-section">
-                    <form id="suggestion_form" name="gs" method="get" action="#">
+                    <!--<form id="suggestion_form" name="gs" method="get" action="#">-->
+                      <form method="post" enctype='multipart/form-data'>{% csrf_token %}
+                        {{ form.non_field_errors }}
                   <div class="searchText">
-                    
-                    <input type="text" name="q" class="searchText" placeholder="Enter your letters here..." autocomplete="off">
+                    <div class="row justify-content-center" style="text-align:center;">
+                    <input type="char" name="boggle_11" class="searchText" placeholder="" autocomplete="off" style="width:50px;" maxlength="1">
+                    <input type="char" name="boggle_12" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                    <input type="char" name="boggle_13" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                    <input type="char" name="boggle_14" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                    </div>
+                    <div class="row justify-content-center" style="text-align:center;">
+                    <input type="char" name="boggle_21" class="searchText" placeholder="" autocomplete="off" style="width:50px;" maxlength="1">
+                    <input type="char" name="boggle_22" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                    <input type="char" name="boggle_23" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                    <input type="char" name="boggle_24" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                    </div>
+                    <div class="row justify-content-center" style="text-align:center;">
+                      <input type="char" name="boggle_31" class="searchText" placeholder="" autocomplete="off" style="width:50px;" maxlength="1">
+                      <input type="char" name="boggle_32" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                      <input type="char" name="boggle_33" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                      <input type="char" name="boggle_34" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                      </div>
+                      <div class="row justify-content-center" style="text-align:center;">
+                        <input type="char" name="boggle_41" class="searchText" placeholder="" autocomplete="off" style="width:50px;" maxlength="1">
+                        <input type="char" name="boggle_42" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                        <input type="char" name="boggle_43" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                        <input type="char" name="boggle_44" class="searchText" placeholder="" autocomplete="off" style="width:50px;margin-left:10px;" maxlength="1">
+                        </div>
                     <!--<ul>
                       <li><label><input type="checkbox" name="ext_com" value="1"><span>.com <em>($10/yr)</em></span></label></li>
                       <li><label><input type="checkbox" name="ext_net" value="1"><span>.net <em>($12/yr)</em></span></label></li>
@@ -66,7 +90,13 @@
               <div class="section-heading">
                 <span>Boggle</span>
                 <h2>Results</h2>
-                <p>LIST OF RESULTS FOR BOGGLE</p>
+                  {% if boggle_solution %}
+                  {% for word in boggle_solution %}
+                  <p>{{ word }}</p>
+                  {% endfor %}
+                  {% else %}
+                  {{ boggle_no_solutions }}
+                  {% endif %}
               </div>
             </div>
           </div>

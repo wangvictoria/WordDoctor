@@ -73,9 +73,13 @@
                   {% if wordscape_letters %}
                    for '{{ wordscape_letters }}'
                   {% endif %}</h2>
+                  {% if wordscape_results %}
                 {% for word in wordscape_results %}
                 <p>{{ word }}</p>
                 {% endfor %}
+                {% else %}
+                {{ wordscape_no_solutions }}
+                {% endif %}
               </div>
             </div>
           </div>

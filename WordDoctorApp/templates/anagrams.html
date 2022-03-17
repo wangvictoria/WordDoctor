@@ -72,9 +72,13 @@
                 {% if anagrams_letters %}
                  for '{{ anagrams_letters }}'
                 {% endif %}</h2>
+                {% if anagrams_results %}
                 {% for word in anagrams_results %}
                 <p>{{ word }}</p>
                 {% endfor %}
+                {% else %}
+                {{ anagrams_no_solutions }}
+                {% endif %}
               </div>
             </div>
           </div>
