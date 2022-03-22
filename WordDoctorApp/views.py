@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib import messages
-from .forms import AnagramsForm, WordscapeForm, WordleForm, BoggleForm
+from .forms import AnagramsForm, WordscapeForm, WordleForm, BoggleForm, ScrabbleForm
 
 from math import ceil
 from trie_test import My_Trie
@@ -112,6 +112,47 @@ def wordle(request):
 
 def scrabble(request):
     context = {}
+    form = ScrabbleForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            user_chars = form.cleaned_data.get('scrabble_letters')
+            chars_on_board = form.cleaned_data.get('scrabble_open')
+
+            context['scrabble_letters'] = user_chars
+            context['chars_on_board'] = chars_on_board
+
+            with open("ospd.txt", "r") as file:
+                word_list = file.readlines()
+
+            processed_list = [word.strip() for word in word_list if (len(word.strip()) >= SCRABBLE_START and len(word.strip()) <= SCRABBLE_END)]
+
+            user_chars = list(user_chars.strip())
+            chars_on_board = list(chars_on_board.strip())
+
+            word_dict = {}
+
+            scrabble_processing(word_dict, processed_list, chars_on_board, user_chars)
+
+            keys_list = [key for key in word_dict.keys()]
+            keys_list.sort(reverse=True)
+
+            scrabble_list = []
+
+            for i in range(SCRABBLE_START, len(user_chars) + 1, 1):
+                length_list = word_dict.get(i)
+                for j in length_list:
+                    scrabble_list.append(j)
+
+            context['scrabble_dict'] = word_dict
+            context['scrabble_words'] = scrabble_list
+            context['scrabble_scores'] = keys_list
+            context['scrabble_no_solutions'] = 'There are no words with the requested letters.\n'
+
+            for key in keys_list:
+                print(f'Scrabble solutions of score {key}:\n')
+                print(*word_dict[key], sep=', ')
+                print('\n')
     return render(request, 'scrabble.html', context)
 
 def anagrams(request):
@@ -185,8 +226,6 @@ def boggle(request):
         if form.is_valid():
             form.save()
 
-            print("<<<<<<<<<<<<<<<<<<")
-            print(form.cleaned_data.get('boggle_11'))
             # initializes boggle board with user input
             boggle_board = np.chararray((4, 4))
 
@@ -210,7 +249,7 @@ def boggle(request):
             boggle_board[3,2] = form.cleaned_data.get('boggle_43')
             boggle_board[3,3] = form.cleaned_data.get('boggle_44')
 
-            print(boggle_board)
+            #print(boggle_board)
             my_trie = create_trie()
             context['boggle_solution'] = solver(boggle_board, my_trie)
             context['boggle_no_solutions'] = 'There are no words with the requested letters.\n'
@@ -269,16 +308,14 @@ def wordscape(request):
             context_list = []
 
             if word_size == None:
-                for i in range(SCRABBLE_START, len(wordscape_chars) + 1, 1):
-                    length_list = wordscapes_solutions.get(i)
-                    for j in length_list:
-                        context_list.append(j)
-                context["wordscape_results"] = context_list
                 # for i in range(SCRABBLE_START, len(wordscape_chars) + 1, 1):
-                #     wordscapes_list.append(wordscapes_solutions[i])
-                #     context['wordscapes_results'] = wordscapes_list
+                #     length_list = wordscapes_solutions.get(i)
+                #     for j in length_list:
+                #         context_list.append(j)
+                # context["wordscape_results"] = context_list
+                context['wordscape_results'] = wordscapes_solutions
             else:
-                context['wordscape_results'] = wordscapes_solutions[word_size]
+                context['wordscape_results_len'] = wordscapes_solutions[word_size]
             
             context['wordscape_letters'] = wordscape_chars
             context['wordscape_no_solutions'] = 'There are no words with the requested letters.\n'
@@ -377,3 +414,69 @@ def create_trie():
             # inserts words into Trie form word_list
             oxford.insert(new_word)
     return oxford
+
+def scrabble_processing(word_dict, processed_list, chars_on_board, user_chars):
+
+    for word in processed_list:
+        user_chars_copy = user_chars.copy()
+        chars_on_board_copy = chars_on_board.copy()
+
+        used_chars = []
+
+        for char in word:
+            if char in user_chars_copy:
+                user_chars_copy.remove(char)
+                used_chars.append(char)
+        
+        # checking to see if every letter of the word except for one on the board
+        # comes from the user's current hand
+
+        if len(used_chars) == (len(word) - 1):
+            for char in word:
+
+                # checking for final character that we need to complete the word
+                # here it's assumed that the character should be on the board and
+                # isn't in used_chars
+                if char in chars_on_board_copy and char not in used_chars:
+                    chars_on_board_copy.remove(char)
+                    used_chars.append(char)
+
+        # accounting for case where all the letters are in the hand to make a word
+        # just in case there is a letter on the board that matches what was in your hand
+        elif len(used_chars) == len(word):
+            for char in used_chars:
+                if char in chars_on_board_copy:
+                    # calculating the scrabble word score - this is self-explanatory, method's further below
+                    score = find_scrabble_base_word_score(word)
+
+                    # if there are no words for a particular score, initialize this key-value pair so we
+                    # can add words of a certain score later.
+                    if score not in word_dict.keys():
+                        word_dict[score] = []
+                                
+                    # adding a word to the list which makes up the value to the key of a specific score
+                    word_dict[score].append(word)
+                    break
+            continue
+        else:
+            continue
+
+        
+        if sorted(word) == sorted("".join(used_chars)):
+
+            # calculating the scrabble word score - this is self-explanatory, method's further below
+            score = find_scrabble_base_word_score(word)
+
+            # if there are no words for a particular score, initialize this key-value pair so we
+            # can add words of a certain score later.
+            if score not in word_dict.keys():
+                word_dict[score] = []
+                        
+            # adding a word to the list which makes up the value to the key of a specific score
+            word_dict[score].append(word)
+
+def find_scrabble_base_word_score(word):
+    score = 0
+    for char in word:
+        score += SCRABBLE_LETTER_SCORES[char]
+    return score

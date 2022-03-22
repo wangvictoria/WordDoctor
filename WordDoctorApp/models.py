@@ -38,3 +38,7 @@ class Boggle(models.Model):
     boggle_42 = models.CharField(max_length=1)
     boggle_43 = models.CharField(max_length=1)
     boggle_44 = models.CharField(max_length=1)
+
+class Scrabble(models.Model):
+    scrabble_letters = models.CharField(max_length=10)
+    scrabble_open = models.CharField(max_length=10)

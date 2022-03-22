@@ -1,5 +1,5 @@
 from django import forms
-from .models import Anagrams, Boggle, Wordle, Wordscape
+from .models import Anagrams, Boggle, Scrabble, Wordle, Wordscape
 
 class AnagramsForm(forms.ModelForm):
     class Meta:
@@ -51,4 +51,12 @@ class BoggleForm(forms.ModelForm):
             'boggle_42',
             'boggle_43',
             'boggle_44',
+        )
+
+class ScrabbleForm(forms.ModelForm):
+    class Meta:
+        model = Scrabble
+        fields = (
+            'scrabble_letters',
+            'scrabble_open',
         )

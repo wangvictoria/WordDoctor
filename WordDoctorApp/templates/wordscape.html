@@ -74,9 +74,17 @@
                    for '{{ wordscape_letters }}'
                   {% endif %}</h2>
                   {% if wordscape_results %}
-                {% for word in wordscape_results %}
-                <p>{{ word }}</p>
+                {% for key, word in wordscape_results.items %}
+                <p>Words with length {{ key }}: 
+                  {% for item in word %}
+                    {{ item }},
+                  {% endfor %}
+                </p>{% endfor %}
+                {% elif wordscape_results_len %}
+                {% for word in wordscape_results_len %}
+                  {{ word }}
                 {% endfor %}
+                
                 {% else %}
                 {{ wordscape_no_solutions }}
                 {% endif %}
