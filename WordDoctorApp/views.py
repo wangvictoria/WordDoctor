@@ -7,6 +7,7 @@ from trie_test import My_Trie
 from timeit import repeat
 import numpy as np
 import itertools as it
+import collections
 
 BOGGLE_WORD_MAX = 16
 BOGGLE_WORD_MIN = 2
@@ -145,7 +146,12 @@ def scrabble(request):
                     for j in length_list:
                         scrabble_list.append(j)
 
-            context['scrabble_dict'] = word_dict
+            # Ordering the dictionary by descending key
+            ordered_word_dict = {}
+            if (word_dict):
+                ordered_word_dict = collections.OrderedDict(sorted(word_dict.items(), reverse=True))
+
+            context['scrabble_ordered_dict'] = ordered_word_dict
             context['scrabble_words'] = scrabble_list
             context['scrabble_scores'] = keys_list
             context['scrabble_no_solutions'] = 'There are no words with the requested letters.\n'

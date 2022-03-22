@@ -72,8 +72,8 @@
                   {% if scrabble_letters %}
                    for '{{ scrabble_letters }}'
                   {% endif %}</h2>
-                  {% if scrabble_dict %}
-                  {% for key, word in scrabble_dict.items %}
+                  {% if scrabble_ordered_dict %}
+                  {% for key, word in scrabble_ordered_dict.items %}
                   <p>Words with score {{ key }}: 
                     {% for item in word %}
                     {{ item }},
