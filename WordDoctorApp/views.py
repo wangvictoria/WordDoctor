@@ -140,9 +140,10 @@ def scrabble(request):
             scrabble_list = []
 
             for i in range(SCRABBLE_START, len(user_chars) + 1, 1):
-                length_list = word_dict.get(i)
-                for j in length_list:
-                    scrabble_list.append(j)
+                if i in word_dict:
+                    length_list = word_dict.get(i)
+                    for j in length_list:
+                        scrabble_list.append(j)
 
             context['scrabble_dict'] = word_dict
             context['scrabble_words'] = scrabble_list
