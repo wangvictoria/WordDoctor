@@ -359,7 +359,7 @@ def wordscapes():
     # word_search_space will be all applicable words of a certain size 
     word_search_space = []
 
-    with open("words.txt", "r") as file:
+    with open("ospd.txt", "r") as file:
         word_list = file.readlines()
 
     print("\n\nProcessing dictionary...\n")
@@ -368,10 +368,9 @@ def wordscapes():
 
         # only allowing words that are longer than 2 chars and shorter than
         # the word we're trying to anagram
-        if (length_check and len(word) == word_size) or not length_check:
-            if len(word) >= SCRABBLE_START:
-                word_search_space.append(word)
-                oxford.insert(word)
+        if len(word) >= SCRABBLE_START:
+            word_search_space.append(word)
+            oxford.insert(word)
                 
     print("\n\nFinding your words...\n")
     find_anagram_words(oxford, t, sorted(wordscape_chars), "")
@@ -386,13 +385,18 @@ def wordscapes():
             if (length_check and len(word) == word_size) or not length_check:
                 wordscapes_solutions[len(word)].append(word)
 
-    for i in range(SCRABBLE_START, len(wordscape_chars) + 1, 1):
-        if wordscapes_solutions[i]:
-            print(f'Potential wordscape words of {i} characters with your letters:')
-            print(*wordscapes_solutions[i], sep=', ')
-            print()
-        else:
-            print(f'There are no words with {i} characters and the requested letters\n')
+    if length_check:
+        print(f'Potential wordscape words of size {word_size}:')
+        print(*wordscapes_solutions[word_size], sep=', ')
+        print()
+    else:
+        for i in range(SCRABBLE_START, len(wordscape_chars) + 1, 1):
+            if wordscapes_solutions[i]:
+                print(f'Potential wordscape words of {i} characters with your letters:')
+                print(*wordscapes_solutions[i], sep=', ')
+                print()
+            else:
+                print(f'There are no words with {i} characters and the requested letters\n')
 
 
 def create_trie():
@@ -534,4 +538,4 @@ def boggle_start():
 #         return 11
 
 if __name__ == "__main__":
-    scrabble_main()
+    wordscapes()
