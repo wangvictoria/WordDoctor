@@ -20,7 +20,7 @@
                   
                   <!--<form id="suggestion_form" name="gs" method="get" action="#">-->
                     <form method="post" enctype='multipart/form-data'>{% csrf_token %}
-                      {{ form.non_field_errors }}
+                      
                   <div class="searchText">
                     
                     <input type="text" name="wordscape_letters" class="searchText" placeholder="Enter your letters here..." autocomplete="off">
@@ -33,6 +33,7 @@
                     </ul>-->
                   </div>
                       <input type="submit" name="submit" class="main-button" value="Search Now">
+                      {{ form.errors }}
                    </form>
                  <div class="advSearch_chkbox">
                  </div>

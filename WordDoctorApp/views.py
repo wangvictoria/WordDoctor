@@ -33,8 +33,8 @@ def index(request):
     return render(request, 'index.html', context)
 
 def wordle(request):
-    context = {}
     form = WordleForm(request.POST or None)
+    context = {'form': form}
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -112,8 +112,8 @@ def wordle(request):
     return render(request, 'wordle.html', context)
 
 def scrabble(request):
-    context = {}
     form = ScrabbleForm(request.POST or None)
+    context = {'form': form}
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -163,8 +163,8 @@ def scrabble(request):
     return render(request, 'scrabble.html', context)
 
 def anagrams(request):
-    context = {}
     form = AnagramsForm(request.POST or None)
+    context = {'form': form}
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -226,9 +226,8 @@ def anagrams(request):
     return render(request, 'anagrams.html', context)
 
 def boggle(request):
-    context = {}
-
     form = BoggleForm(request.POST or None)
+    context = {'form': form}
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -260,14 +259,38 @@ def boggle(request):
             my_trie = create_trie()
             context['boggle_solution'] = solver(boggle_board, my_trie)
             context['boggle_no_solutions'] = 'There are no words with the requested letters.\n'
+            
+            boggle_list = [
+                form.cleaned_data.get('boggle_11'),
+                form.cleaned_data.get('boggle_12'),
+                form.cleaned_data.get('boggle_13'),
+                form.cleaned_data.get('boggle_14'),
+
+                form.cleaned_data.get('boggle_21'),
+                form.cleaned_data.get('boggle_22'),
+                form.cleaned_data.get('boggle_23'),
+                form.cleaned_data.get('boggle_24'),
+
+                form.cleaned_data.get('boggle_31'),
+                form.cleaned_data.get('boggle_32'),
+                form.cleaned_data.get('boggle_33'),
+                form.cleaned_data.get('boggle_34'),
+
+                form.cleaned_data.get('boggle_41'),
+                form.cleaned_data.get('boggle_42'),
+                form.cleaned_data.get('boggle_43'),
+                form.cleaned_data.get('boggle_44'),
+            ]
+
+            context['boggle_input'] = boggle_list
 
         else:
             form = BoggleForm(request.POST or None)
     return render(request, 'boggle.html', context)
 
 def wordscape(request):
-    context = {}
     form = WordscapeForm(request.POST or None)
+    context = {'form': form}
     if request.method == 'POST':
         if form.is_valid():
             form.save()
