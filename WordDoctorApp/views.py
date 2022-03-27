@@ -257,7 +257,9 @@ def boggle(request):
 
             #print(boggle_board)
             my_trie = create_trie()
-            context['boggle_solution'] = solver(boggle_board, my_trie)
+            words = solver(boggle_board, my_trie)
+            context['boggle_solution'] = words
+            context['num_words'] = len(words)
             context['boggle_no_solutions'] = 'There are no words with the requested letters.\n'
             
             boggle_list = [
