@@ -138,6 +138,7 @@
                   </div>
                 </div>
                   {% if boggle_solution %}
+                  <br>
                   {% for word in boggle_solution %}
                   <p id="word" onclick="highlight()">{{ word }}</p>
                   {% endfor %}
