@@ -35,9 +35,9 @@
 
     </style>
     <script>
-      function highlight() {
+      function highlight(word_id) {
         // for loop going through all the letters in the path
-        document.getElementById("word").style.color = 'red';
+        document.getElementById("word"+word_id).style.color = 'red';
         document.getElementById("letter").style.color = 'red';
       }
     </script>
@@ -140,7 +140,7 @@
                   {% if boggle_solution %}
                   <br>
                   {% for word in boggle_solution %}
-                  <p id="word" onclick="highlight()">{{ word }}</p>
+                  <p id="word{{ forloop.counter0 }}" onclick="highlight('{{ forloop.counter0 }}')">{{ word }}</p>
                   {% endfor %}
                   {% else %}
                   {{ boggle_no_solutions }}
