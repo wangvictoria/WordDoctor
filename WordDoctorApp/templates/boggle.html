@@ -149,8 +149,8 @@
                 </div>
                   {% if boggle_solution %}
                   <br>
-                  {% for word in boggle_solution %}
-                  <p id="word{{ forloop.counter0 }}" onclick="highlight('{{ forloop.counter0 }}', '{{ forloop.counter0 }}', '{{ num_words }}')">{{ word }}</p>
+                  {% for key, value in boggle_solution.items %}
+                  <p id="word{{ forloop.counter0 }}" onclick="highlight('{{ forloop.counter0 }}', '{{ forloop.counter0 }}', '{{ num_words }}')">{{ key }}</p>
                   {% endfor %}
                   {% else %}
                   {{ boggle_no_solutions }}

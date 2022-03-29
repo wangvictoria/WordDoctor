@@ -389,15 +389,18 @@ def find_boggle_score(solved_word):
     else:
         return 11
 
-def solverRecursive(board, visited, dictionary, x, y, my_string, boggle_solution):
-    # mark visited
+def solverRecursive(board, visited, dictionary, x, y, my_string, boggle_solution, path_list):
+    # mark visited, append current square number to list
     visited[x][y] = True
+    cur_square = 4 * x + y + 1
+    path_list.append(cur_square)
     # update string with letter on board
     tempstr = board[x][y].decode("utf-8")
     my_string += tempstr
     #  print if word
     if dictionary.is_word(my_string):
-        boggle_solution.append(my_string)
+        path_list_copy = path_list.copy()
+        boggle_solution.update({my_string: path_list_copy})
 
     # traverse adjacent cells to current cell
     # move index to row above i
@@ -407,25 +410,28 @@ def solverRecursive(board, visited, dictionary, x, y, my_string, boggle_solution
             colIndex = y - 1
             while colIndex <= y + 1 and colIndex < BOGGLE_SIDE_LEN:
                 if rowIndex >= 0 and colIndex >= 0 and not visited[rowIndex][colIndex]:
-                    solverRecursive(board, visited, dictionary, rowIndex, colIndex, my_string, boggle_solution)
+                    solverRecursive(board, visited, dictionary, rowIndex, colIndex, my_string, boggle_solution, path_list)
                 colIndex += 1
             rowIndex += 1
 
+    
+    path_list.remove(cur_square)
     my_string = "" + my_string[-1]
     visited[x][y] = False
 
 def solver(board, dictionary):
     # creates array of visited cells initialized to false
     visited = np.full((4, 4), False)
-    boggle_solution = []
+    boggle_solution = {}
     #   print(visited)
 
     temp_string = ""
+    path_list = []
 
     # nested for loop traversing through all letters on boggle board
     for a in range(BOGGLE_SIDE_LEN):
         for b in range(BOGGLE_SIDE_LEN):
-            solverRecursive(board, visited, dictionary, a, b, temp_string, boggle_solution)
+            solverRecursive(board, visited, dictionary, a, b, temp_string, boggle_solution, path_list)
             visited[:] = False
     return boggle_solution
 
