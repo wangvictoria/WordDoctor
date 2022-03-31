@@ -119,26 +119,37 @@ def find_scrabble_base_word_score(word):
 
 
 def wordle():
-
     char_locations = []
     char_list = ['a', 'b', 'c', 'd', 'e', 'f']
-    while(len(char_locations) != 5):
+    while (len(char_locations) != 5):
         char_locations = input("Enter locations of letters with unknown letters as underscores: ")
 
     num_known_characters = 0
     for i in range(0, WORDLE_LEN, 1):
-                if char_locations[i] != "_":
-                    num_known_characters = num_known_characters + 1
+        if char_locations[i] != "_":
+            num_known_characters = num_known_characters + 1
+
+    spaces_in_wordle_word = dict.fromkeys([num for num in range(1, WORDLE_LEN + 1, 1)])
 
     while(len(char_list) + num_known_characters > WORDLE_LEN):
-        char_list = input("Enter characters: ")
-    
+        char_list = []
+        for i in range(1, WORDLE_LEN + 1, 1):
+            spaces_in_wordle_word[i] = input(
+                f"Enter yellow letters in word you know aren't in wordle space {i}: ").strip().lower()
+        for j in range(len(spaces_in_wordle_word)):
+            char_list.extend(list(spaces_in_wordle_word[j+1]))
+        char_list = list(set(char_list))
+
+
+
+
     check_for_invalid_letters = ""
     invalid_chars = ""
-    
+
     # optional prompting to allow for users to enter letters that they know are invalid
     input_valid_for_invalid_letters = False
-    check_for_invalid_letters = input("Do you want to enter characters that you know are invalid? (y/n) ").strip().lower()
+    check_for_invalid_letters = input(
+        "Do you want to enter characters that you know are invalid? (y/n) ").strip().lower()
     while not input_valid_for_invalid_letters:
         if check_for_invalid_letters == "n" or check_for_invalid_letters == "no":
             input_valid_for_invalid_letters = True
@@ -149,12 +160,12 @@ def wordle():
             # using set feature to eliminate letters that were entered multiple times and reduce them to one letter
             invalid_chars = list(set(input("Enter characters that you know are invalid: ").strip().lower()))
         else:
-            check_for_invalid_letters = input("Invalid input - Do you want to enter characters that you know are invalid? (y/n) ").strip().lower()
-    
+            check_for_invalid_letters = input(
+                "Invalid input - Do you want to enter characters that you know are invalid? (y/n) ").strip().lower()
+
     print(invalid_chars)
     if len(invalid_chars) == 0:
         check_for_invalid_letters = False
-
 
     with open("wordle.txt", "r") as file:
         word_list = file.readlines()
@@ -169,6 +180,10 @@ def wordle():
                 if char_locations[j] != "_":
                     if word[j] != char_locations[j]:
                         valid = False
+                        break
+                if word[j] in spaces_in_wordle_word[j + 1]:
+                    valid = False
+                    break
             if valid:
                 if len(char_list) == 0:
                     wordle_solutions.append(word)
@@ -192,14 +207,13 @@ def wordle():
     if invalid_chars and filtered_wordle_solutions:
         print('Potential Wordle words with requested letters:')
         print(*filtered_wordle_solutions, sep=", ")
-        print()  
+        print()
     elif not invalid_chars and wordle_solutions:
         print('Potential Wordle words with requested letters:')
         print(*wordle_solutions, sep=", ")
         print()
     else:
         print('There are no words with the requested letters.\n')
-
 
 def anagrams():
 
@@ -538,4 +552,4 @@ def boggle_start():
 #         return 11
 
 if __name__ == "__main__":
-    wordscapes()
+    wordle()
