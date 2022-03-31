@@ -437,7 +437,7 @@ def solver(board, dictionary):
 
 def create_trie():
     # creates list where each word in dictionary is an item in the list
-    with open("words.txt", "r") as file:
+    with open("ospd.txt", "r") as file:
         word_list = file.readlines()
 
     # initializes Trie
