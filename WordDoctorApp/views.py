@@ -43,32 +43,44 @@ def wordle(request):
 
             # populate char locations
             char_locations = []
+            char_list = ['a', 'b', 'c', 'd', 'e', 'f']
             wordle_char_locations(char_locations, form, 'wordle_loc1')
             wordle_char_locations(char_locations, form, 'wordle_loc2')
             wordle_char_locations(char_locations, form, 'wordle_loc3')
             wordle_char_locations(char_locations, form, 'wordle_loc4')
             wordle_char_locations(char_locations, form, 'wordle_loc5')
 
+            num_known_characters = 0
+            for i in range(0, WORDLE_LEN, 1):
+                if char_locations[i] != "_":
+                    num_known_characters = num_known_characters + 1
 
-            # TODO: fix error checking for user input known characters
-            # num_known_characters = 0
-            # for i in range(0, WORDLE_LEN, 1):
-            #     if char_locations[i] != "_":
-            #         num_known_characters = num_known_characters + 1
+            spaces_in_wordle_word = dict.fromkeys([num for num in range(1, WORDLE_LEN + 1, 1)])
 
-            char_list = form.cleaned_data.get('wordle_known_letters')
-            if char_list == None:
-                char_list = ""
+            while(len(char_list) + num_known_characters > WORDLE_LEN):
+                char_list = []
+                spaces_in_wordle_word[1] = form.cleaned_data.get('wordle_loc6')
+                spaces_in_wordle_word[2] = form.cleaned_data.get('wordle_loc7')
+                spaces_in_wordle_word[3] = form.cleaned_data.get('wordle_loc8')
+                spaces_in_wordle_word[4] = form.cleaned_data.get('wordle_loc9')
+                spaces_in_wordle_word[5] = form.cleaned_data.get('wordle_loc10')
+                for i in range(1, WORDLE_LEN + 1, 1):
+                    if spaces_in_wordle_word[i] == None:
+                        spaces_in_wordle_word[i] = ""
+                for j in range(len(spaces_in_wordle_word)):
+                    char_list.extend(list(spaces_in_wordle_word[j+1]))
+                char_list = list(set(char_list))
 
             check_for_invalid_letters = ""
-            if (form.cleaned_data.get('wordle_invalid_letters') != None):
-                invalid_chars = list(set(form.cleaned_data.get('wordle_invalid_letters').strip().lower()))
+            if form.cleaned_data.get('wordle_invalid_letters') != None:
+                invalid_chars = form.cleaned_data.get('wordle_invalid_letters')
             else:
                 invalid_chars = ""
 
-            if not(char_locations) and invalid_chars == "" and char_list == "":
-                messages.error(request, 'Please input a value.')
-            
+
+            if len(invalid_chars) == 0:
+                check_for_invalid_letters = False
+
             with open("wordle.txt", "r") as file:
                 word_list = file.readlines()
 
@@ -82,6 +94,10 @@ def wordle(request):
                         if char_locations[j] != "_":
                             if word[j] != char_locations[j]:
                                 valid = False
+                                break
+                        if word[j] in spaces_in_wordle_word[j + 1]:
+                            valid = False
+                            break
                     if valid:
                         if len(char_list) == 0:
                             wordle_solutions.append(word)
@@ -101,6 +117,7 @@ def wordle(request):
                             break
                         if i == WORDLE_LEN - 1:
                             filtered_wordle_solutions.append(word)
+
             if invalid_chars and filtered_wordle_solutions:
                 context['filtered_wordle_solutions'] = filtered_wordle_solutions
             elif not invalid_chars and wordle_solutions:
