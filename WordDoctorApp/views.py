@@ -56,6 +56,7 @@ def wordle(request):
                     num_known_characters = num_known_characters + 1
 
             spaces_in_wordle_word = dict.fromkeys([num for num in range(1, WORDLE_LEN + 1, 1)])
+            print(form.cleaned_data.get('wordle_loc6'))
 
             while(len(char_list) + num_known_characters > WORDLE_LEN):
                 char_list = []
@@ -70,12 +71,12 @@ def wordle(request):
                 for j in range(len(spaces_in_wordle_word)):
                     char_list.extend(list(spaces_in_wordle_word[j+1]))
                 char_list = list(set(char_list))
+            
 
             check_for_invalid_letters = ""
+            invalid_chars = ""
             if form.cleaned_data.get('wordle_invalid_letters') != None:
-                invalid_chars = form.cleaned_data.get('wordle_invalid_letters')
-            else:
-                invalid_chars = ""
+                invalid_chars = list(set(form.cleaned_data.get('wordle_invalid_letters')))
 
 
             if len(invalid_chars) == 0:

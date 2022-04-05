@@ -15,6 +15,11 @@ class Wordle(models.Model):
     wordle_loc3 = models.CharField(max_length=1, blank=True, null=True)
     wordle_loc4 = models.CharField(max_length=1, blank=True, null=True)
     wordle_loc5 = models.CharField(max_length=1, blank=True, null=True)
+    wordle_loc6 = models.CharField(max_length=5, blank=True, null=True)
+    wordle_loc7 = models.CharField(max_length=5, blank=True, null=True)
+    wordle_loc8 = models.CharField(max_length=5, blank=True, null=True)
+    wordle_loc9 = models.CharField(max_length=5, blank=True, null=True)
+    wordle_loc10 = models.CharField(max_length=5, blank=True, null=True)
     wordle_known_letters = models.CharField(max_length=5, blank=True, null=True)
     wordle_invalid_letters = models.CharField(max_length=26, blank=True, null=True)
 
