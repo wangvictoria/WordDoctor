@@ -122,7 +122,10 @@ def wordle():
     char_locations = []
     char_list = ['a', 'b', 'c', 'd', 'e', 'f']
     while (len(char_locations) != 5):
-        char_locations = input("Enter locations of letters with unknown letters as underscores: ")
+        char_locations = input("Enter locations of letters with unknown letters as underscores: ").strip().lower()
+        if char_locations == "_____" or not any(c.isalpha() for c in char_locations):
+            print("You need to know at least one letter in the word for us to guess! Try again.\n")
+            char_locations = ""
 
     num_known_characters = 0
     for i in range(0, WORDLE_LEN, 1):
@@ -139,9 +142,6 @@ def wordle():
         for j in range(len(spaces_in_wordle_word)):
             char_list.extend(list(spaces_in_wordle_word[j+1]))
         char_list = list(set(char_list))
-
-
-
 
     check_for_invalid_letters = ""
     invalid_chars = ""
