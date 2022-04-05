@@ -89,7 +89,7 @@ a.gradient-button:hover {
 }
 
 .page-heading {
-	background-image: url(../images/wooden-scrabble2-resized2.jpg);
+	background-image: url(../images/wooden-scrabble-dark.jpg);
 	background-position: center center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -356,7 +356,7 @@ header {
 
 /* Banner Style */
 .banner {
-	background-image: url(../images/banner-bg.jpg);
+	background-image: url(../images/books-dark.jpg);
 	background-size: cover;
 	background-repeat: no-repeat;
 	padding: 300px 0px;
@@ -739,7 +739,7 @@ header {
 
 /* Footer Style */
 footer {
-	background-image: url(../images/footer-bg.jpg);
+	background-image: url(../images/lights-dark.jpg);
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: center center;
