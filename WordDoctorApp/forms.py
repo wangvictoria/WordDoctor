@@ -25,6 +25,11 @@ class WordleForm(forms.ModelForm):
             'wordle_loc3',
             'wordle_loc4',
             'wordle_loc5',
+            'wordle_loc6',
+            'wordle_loc7',
+            'wordle_loc8',
+            'wordle_loc9',
+            'wordle_loc10',
             'wordle_known_letters',
             'wordle_invalid_letters',
         )
