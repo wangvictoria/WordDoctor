@@ -22,6 +22,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('WordDoctorApp/', include('WordDoctorApp.urls')),
-    path('', RedirectView.as_view(url='WordDoctorApp/')),
+    path('worddoctor/', include('WordDoctorApp.urls')),
+    path('', RedirectView.as_view(url='worddoctor/')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
