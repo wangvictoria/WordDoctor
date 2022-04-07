@@ -44,18 +44,31 @@
         document.getElementById("word"+word_id).style.color = 'red';
 
 
+        // Loop reverts all characters in square to default size and color
         for (let i = 1; i < 17; i++)
         {
           document.getElementById("letter"+i).style.color = 'black';
+          document.getElementById("letter"+i).style.fontSize = '22px';
         }
 
-        box_obj = JSON.parse(boxes)
+        var i = 0;
 
-        for (let i = 0; i < box_obj.length; i++)
+        // A function to loop through the letters in the word and highlight each one
+        // with a small delay (650 ms) between each highlighted letter
+        function loop_delay(boxes) 
         {
-          document.getElementById("letter"+box_obj[i]).style.color = 'red';
+          setTimeout(function() {   
+            box_obj = JSON.parse(boxes);
+            document.getElementById("letter"+box_obj[i]).style.color = 'red';
+            document.getElementById("letter"+box_obj[i]).style.fontSize = '28px';   
+            i++;                    
+            if (i < box_obj.length) {           
+              loop_delay(boxes);             
+            }                       
+          }, 650)
         }
 
+        loop_delay(boxes)
         
       }
     </script>
