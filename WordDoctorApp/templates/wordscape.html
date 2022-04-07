@@ -31,12 +31,16 @@
                       <li><label><input type="checkbox" name="ext_org" value="1"><span>.org <em>($8/yr)</em></span></label></li>
                       <li><label><input type="checkbox" name="ext_in" value="1"><span>.in <em>($6/yr)</em></span></label></li>
                     </ul>-->
+                    
+                
                   </div>
-                      <input type="submit" name="submit" class="main-button" value="Search Now">
+                      
                       {{ form.errors }}
-                   </form>
-                 <div class="advSearch_chkbox">
-                 </div>
+
+                <div class="col-md-12">
+                  <input type="submit" name="submit" class="main-button" value="Search Now">
+                </div>
+                </form>
                 </div>
               </div>
             </div>
@@ -83,7 +87,7 @@
                 </p>{% endfor %}
                 {% elif wordscape_results_len %}
                 {% for word in wordscape_results_len %}
-                  {{ word }}
+                  {{ word }},
                 {% endfor %}
                 
                 {% else %}

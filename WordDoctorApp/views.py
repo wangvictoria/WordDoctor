@@ -56,7 +56,6 @@ def wordle(request):
                     num_known_characters = num_known_characters + 1
 
             spaces_in_wordle_word = dict.fromkeys([num for num in range(1, WORDLE_LEN + 1, 1)])
-            print(form.cleaned_data.get('wordle_loc6'))
 
             while(len(char_list) + num_known_characters > WORDLE_LEN):
                 char_list = []
@@ -68,6 +67,8 @@ def wordle(request):
                 for i in range(1, WORDLE_LEN + 1, 1):
                     if spaces_in_wordle_word[i] == None:
                         spaces_in_wordle_word[i] = ""
+                    else:
+                        spaces_in_wordle_word[i] = spaces_in_wordle_word[i].strip().lower()
                 for j in range(len(spaces_in_wordle_word)):
                     char_list.extend(list(spaces_in_wordle_word[j+1]))
                 char_list = list(set(char_list))
@@ -76,7 +77,7 @@ def wordle(request):
             check_for_invalid_letters = ""
             invalid_chars = ""
             if form.cleaned_data.get('wordle_invalid_letters') != None:
-                invalid_chars = list(set(form.cleaned_data.get('wordle_invalid_letters')))
+                invalid_chars = list(set(form.cleaned_data.get('wordle_invalid_letters').strip().lower()))
 
 
             if len(invalid_chars) == 0:
@@ -135,8 +136,8 @@ def scrabble(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            user_chars = form.cleaned_data.get('scrabble_letters')
-            chars_on_board = form.cleaned_data.get('scrabble_open')
+            user_chars = form.cleaned_data.get('scrabble_letters').strip().lower()
+            chars_on_board = form.cleaned_data.get('scrabble_open').strip().lower()
 
             context['scrabble_letters'] = user_chars
             context['chars_on_board'] = chars_on_board
@@ -186,7 +187,7 @@ def anagrams(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            word_to_anagram = form.cleaned_data.get('anagrams_letters')
+            word_to_anagram = form.cleaned_data.get('anagrams_letters').strip().lower()
             
             word_list = None
 
@@ -253,25 +254,25 @@ def boggle(request):
             # initializes boggle board with user input
             boggle_board = np.chararray((4, 4))
 
-            boggle_board[0,0] = form.cleaned_data.get('boggle_11')
-            boggle_board[0,1] = form.cleaned_data.get('boggle_12')
-            boggle_board[0,2] = form.cleaned_data.get('boggle_13')
-            boggle_board[0,3] = form.cleaned_data.get('boggle_14')
+            boggle_board[0,0] = form.cleaned_data.get('boggle_11').lower()
+            boggle_board[0,1] = form.cleaned_data.get('boggle_12').lower()
+            boggle_board[0,2] = form.cleaned_data.get('boggle_13').lower()
+            boggle_board[0,3] = form.cleaned_data.get('boggle_14').lower()
 
-            boggle_board[1,0] = form.cleaned_data.get('boggle_21')
-            boggle_board[1,1] = form.cleaned_data.get('boggle_22')
-            boggle_board[1,2] = form.cleaned_data.get('boggle_23')
-            boggle_board[1,3] = form.cleaned_data.get('boggle_24')
+            boggle_board[1,0] = form.cleaned_data.get('boggle_21').lower()
+            boggle_board[1,1] = form.cleaned_data.get('boggle_22').lower()
+            boggle_board[1,2] = form.cleaned_data.get('boggle_23').lower()
+            boggle_board[1,3] = form.cleaned_data.get('boggle_24').lower()
 
-            boggle_board[2,0] = form.cleaned_data.get('boggle_31')
-            boggle_board[2,1] = form.cleaned_data.get('boggle_32')
-            boggle_board[2,2] = form.cleaned_data.get('boggle_33')
-            boggle_board[2,3] = form.cleaned_data.get('boggle_34')
+            boggle_board[2,0] = form.cleaned_data.get('boggle_31').lower()
+            boggle_board[2,1] = form.cleaned_data.get('boggle_32').lower()
+            boggle_board[2,2] = form.cleaned_data.get('boggle_33').lower()
+            boggle_board[2,3] = form.cleaned_data.get('boggle_34').lower()
 
-            boggle_board[3,0] = form.cleaned_data.get('boggle_41')
-            boggle_board[3,1] = form.cleaned_data.get('boggle_42')
-            boggle_board[3,2] = form.cleaned_data.get('boggle_43')
-            boggle_board[3,3] = form.cleaned_data.get('boggle_44')
+            boggle_board[3,0] = form.cleaned_data.get('boggle_41').lower()
+            boggle_board[3,1] = form.cleaned_data.get('boggle_42').lower()
+            boggle_board[3,2] = form.cleaned_data.get('boggle_43').lower()
+            boggle_board[3,3] = form.cleaned_data.get('boggle_44').lower()
 
             #print(boggle_board)
             my_trie = create_trie()
@@ -281,25 +282,25 @@ def boggle(request):
             context['boggle_no_solutions'] = 'There are no words with the requested letters.\n'
             
             boggle_list = [
-                form.cleaned_data.get('boggle_11'),
-                form.cleaned_data.get('boggle_12'),
-                form.cleaned_data.get('boggle_13'),
-                form.cleaned_data.get('boggle_14'),
+                form.cleaned_data.get('boggle_11').lower(),
+                form.cleaned_data.get('boggle_12').lower(),
+                form.cleaned_data.get('boggle_13').lower(),
+                form.cleaned_data.get('boggle_14').lower(),
 
-                form.cleaned_data.get('boggle_21'),
-                form.cleaned_data.get('boggle_22'),
-                form.cleaned_data.get('boggle_23'),
-                form.cleaned_data.get('boggle_24'),
+                form.cleaned_data.get('boggle_21').lower(),
+                form.cleaned_data.get('boggle_22').lower(),
+                form.cleaned_data.get('boggle_23').lower(),
+                form.cleaned_data.get('boggle_24').lower(),
 
-                form.cleaned_data.get('boggle_31'),
-                form.cleaned_data.get('boggle_32'),
-                form.cleaned_data.get('boggle_33'),
-                form.cleaned_data.get('boggle_34'),
+                form.cleaned_data.get('boggle_31').lower(),
+                form.cleaned_data.get('boggle_32').lower(),
+                form.cleaned_data.get('boggle_33').lower(),
+                form.cleaned_data.get('boggle_34').lower(),
 
-                form.cleaned_data.get('boggle_41'),
-                form.cleaned_data.get('boggle_42'),
-                form.cleaned_data.get('boggle_43'),
-                form.cleaned_data.get('boggle_44'),
+                form.cleaned_data.get('boggle_41').lower(),
+                form.cleaned_data.get('boggle_42').lower(),
+                form.cleaned_data.get('boggle_43').lower(),
+                form.cleaned_data.get('boggle_44').lower(),
             ]
 
             context['boggle_input'] = boggle_list
@@ -389,7 +390,7 @@ def find_anagram_words(oxford, t, word_to_anagram, text):
 
 def wordle_char_locations(char_locations, form, loc):
     if (form.cleaned_data.get(loc) != None):
-        char_locations.append(form.cleaned_data.get(loc))
+        char_locations.append(form.cleaned_data.get(loc).strip().lower())
     else:
         char_locations.append('_')
 
