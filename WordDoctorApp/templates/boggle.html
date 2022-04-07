@@ -119,11 +119,11 @@
                       <li><label><input type="checkbox" name="ext_in" value="1"><span>.in <em>($6/yr)</em></span></label></li>
                     </ul>-->
                   </div>
-                      <input type="submit" name="results" class="main-button" value="Search Now">
                       {{ form.errors }}
-                   </form>
-                 <div class="advSearch_chkbox">
-                 </div>
+                  <div class="col-md-12">
+                    <input type="submit" name="submit" class="main-button" value="Search Now">
+                  </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -141,8 +141,13 @@
                 <a href="#"><h4>BOGGLE</h4></a>
               </div>
             </div>
-            <div class="col-md-12" id="scrollhere">
-                Description of Boggle
+            <div class="col-md-12" id="board">
+              To use Boggle solver:
+                <ol>
+                  <li>Enter all letters from your Boggle board.</li>
+                  <li>Click SEARCH NOW.</li>
+                  <li>Click on any word in the Results panel to see its red path on the solution board.</li>
+                </ol>
             </div>
           </div>
         </div>
@@ -171,7 +176,7 @@
                   {% if boggle_solution %}
                   <br>
                   {% for key, value in boggle_solution.items %}
-                  <a href="#scrollhere" id="word{{ forloop.counter0 }}" onclick="highlight('{{ forloop.counter0 }}', '{{ forloop.counter0 }}', '{{ num_words }}', '{{ value }}')" style="color:grey;">{{ key }} <br></a>
+                  <a href="#board" id="word{{ forloop.counter0 }}" onclick="highlight('{{ forloop.counter0 }}', '{{ forloop.counter0 }}', '{{ num_words }}', '{{ value }}')" style="color:grey;">{{ key }} <br></a>
                   {% endfor %}
                   {% else %}
                   {{ boggle_no_solutions }}
