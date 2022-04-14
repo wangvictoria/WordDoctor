@@ -330,7 +330,7 @@ def wordscape(request):
             # word_search_space will be all applicable words of a certain size 
             word_search_space = []
 
-            with open("words.txt", "r") as file:
+            with open("ospd.txt", "r") as file:
                 word_list = file.readlines()
 
             for word in word_list:
@@ -456,7 +456,7 @@ def solver(board, dictionary):
 
 def create_trie():
     # creates list where each word in dictionary is an item in the list
-    with open("ospd.txt", "r") as file:
+    with open("boggle_dict.txt", "r") as file:
         word_list = file.readlines()
 
     # initializes Trie
@@ -465,6 +465,7 @@ def create_trie():
     # removes all leading and trailing whitespace for each word in list
     for new_word in word_list:
         new_word = new_word.strip()
+        new_word = new_word.lower()
         # only allowing words that are longer than 2 chars and shorter than
         # the max length of a Boggle word (16 chars)
         if BOGGLE_WORD_MAX >= len(new_word) > BOGGLE_WORD_MIN:
