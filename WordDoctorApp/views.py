@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.contrib import messages
 from .forms import AnagramsForm, WordscapeForm, WordleForm, BoggleForm, ScrabbleForm
 
-# Test
 
 from math import ceil
 from trie_test import My_Trie
